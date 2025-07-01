@@ -17,13 +17,24 @@ export const routes: Routes = [
       import('./pages/contact/contact').then(m => m.Contact),
   },
   {
+    path: 'services',
+    loadComponent: () =>
+      import('./pages/services/services').then(m => m.Services),
+  },
+  {
     path: 'reserver',
     loadComponent: () =>
-      import('./pages/reserver/reserver').then(m => m.Reserver),
+      import('./pages/services/reserver/reserver').then(m => m.ReserverComponent)
   },
   {
     path: 'calendrier',
     loadComponent: () =>
       import('./pages/calendrier/calendrier').then(m => m.Calendrier),
+  },
+  {
+    path: 'confirmation-info',
+    loadComponent: () =>
+      import('./pages/services/confirmation-info/confirmation-info').then(m => m.ConfirmationInfo),
   }
+
 ];

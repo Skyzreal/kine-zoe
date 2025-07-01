@@ -1,0 +1,74 @@
+.confirmation-container {
+  padding: 120px 5% 4rem;
+  font-family: 'Georgia', serif;
+  text-align: center;
+  background: #fefefe;
+  position: relative;
+}
+
+.subtitle {
+  color: #555;
+  margin-bottom: 2rem;
+}
+
+.form-note {
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+}
+
+.info-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 500px;
+  margin: 0 auto;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.info-form input {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.info-form button {
+  background: #f4ec9d;
+  padding: 0.8rem;
+  border: 1px solid black;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.thank-you {
+  padding: 140px 5% 4rem;
+  text-align: center;
+  font-family: 'Georgia', serif;
+}
+
+.bg-shape {
+  position: absolute;
+  z-index: 0;
+  opacity: 0.2;
+  border-radius: 50%;
+}
+
+.shape1 {
+  width: 400px;
+  height: 400px;
+  background: #d5eafd;
+  top: -100px;
+  left: -100px;
+}
+
+.shape2 {
+  width: 300px;
+  height: 300px;
+  background: #ffd5e6;
+  bottom: -80px;
+  right: -60px;
+}

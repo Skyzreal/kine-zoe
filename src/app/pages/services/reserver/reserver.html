@@ -1,0 +1,41 @@
+<div class="reserver-container">
+  <div class="bg-shape shape1"></div>
+  <div class="bg-shape shape2"></div>
+
+  <h1>Réservez votre rendez-vous pour <p><strong>Service:</strong> {{ selectedService || 'Non spécifié' }}</p>
+  </h1>
+
+  <p class="subtitle">Choisissez une heure et une date qui vous convient</p>
+
+  <div class="reserver-grid">
+    <!-- Quelques dates juste pour un template -->
+    <div class="calendar">
+      <h3>Octobre 2024</h3>
+      <div class="calendar-grid">
+        <div class="day selected">21</div>
+        <div class="day">22</div>
+        <div class="day">23</div>
+
+      </div>
+    </div>
+
+    <div class="time-slots">
+      <h3>21 Octobre 2024</h3>
+      <button class="time-btn selected">10:00 AM</button>
+      <button class="time-btn">4:00 PM</button>
+      <button class="time-btn">6:00 PM</button>
+    </div>
+  </div>
+
+  <div class="summary-box">
+    <h3>Votre réservation</h3>
+    <p><strong>Service:</strong> Perte de poids</p>
+    <p><strong>Date:</strong> 21 octobre</p>
+    <p><strong>Heure:</strong> 10:00 AM à 11:00 AM</p>
+    <p><strong>$132,22</strong></p>
+    <button class="confirm-btn" [routerLink]="['/confirmation-info']">
+      Confirmer la réservation
+    </button>
+
+  </div>
+</div>

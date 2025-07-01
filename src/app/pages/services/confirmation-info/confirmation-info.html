@@ -1,0 +1,30 @@
+<div class="confirmation-container" *ngIf="!formSubmitted">
+  <div class="bg-shape shape1"></div>
+  <div class="bg-shape shape2"></div>
+
+  <h1>Information</h1>
+  <p class="subtitle">Entrez vos informations</p>
+
+  <form class="info-form" (ngSubmit)="submitForm()" #userForm="ngForm">
+    <p class="form-note">Tous les champs sont obligatoires</p>
+
+    <label>Prénom</label>
+    <input name="prenom" ngModel required placeholder="Placeholder" />
+
+    <label>Nom</label>
+    <input name="nom" ngModel required placeholder="Placeholder" />
+
+    <label>Numéro de téléphone</label>
+    <input name="phone" ngModel required placeholder="Placeholder" />
+
+    <label>E-mail</label>
+    <input name="email" ngModel type="email" required placeholder="Placeholder" />
+
+    <button type="submit">Soumettre</button>
+  </form>
+</div>
+
+<div class="thank-you" *ngIf="formSubmitted">
+  <h2>Merci pour votre réservation !</h2>
+  <p>Vous recevrez un courriel de confirmation sous peu.</p>
+</div>

@@ -8,4 +8,10 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./navbar.css'],
   imports: [RouterModule]
 })
-export class NavbarComponent {}
+export class NavbarComponent {
+  menuOpen = false;
+
+  toggleMenu() {
+    this.menuOpen = !this.menuOpen;
+  }
+}

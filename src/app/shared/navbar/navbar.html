@@ -1,13 +1,17 @@
 <header class="nav">
   <div class="nav-left">
     <a class="logo" routerLink="/">
-      <img src="../../../assets/images/logo.png" alt="Zowéanne Fournier Logo" />
+      <img src="assets/images/LOGO-Kine.png" alt="Logo" />
     </a>
+
+    <button class="hamburger" (click)="toggleMenu()" aria-label="Toggle menu">
+      ☰
+    </button>
   </div>
 
-  <div class="nav-right">
+  <nav class="nav-right" [class.open]="menuOpen">
     <a routerLink="/about" routerLinkActive="active">À propos de moi</a>
     <a routerLink="/contact" routerLinkActive="active">Contact</a>
-    <a class="cta" routerLink="/services" routerLinkActive="active">Réserver en ligne</a>
-  </div>
+    <a class="cta" routerLink="/reserver" routerLinkActive="active">Réserver en ligne</a>
+  </nav>
 </header>

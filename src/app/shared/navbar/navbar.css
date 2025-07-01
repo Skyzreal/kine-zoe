@@ -35,7 +35,7 @@
 }
 
 .logo img {
-  max-height: 48px;
+  max-height: 80px;
   width: auto;
   object-fit: contain;
 }
@@ -58,4 +58,50 @@
   font-weight: bold;
   border: black solid 1px;
   white-space: nowrap;
+}
+.hamburger {
+  display: none;
+  font-size: 2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: auto;
+  padding: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
+    padding-right:3rem;
+    height:3rem;
+  }
+
+  .nav {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+    height: auto;
+  }
+
+  .nav-left {
+    width: 100%;
+    justify-content: space-between;
+    padding-left: 0;
+  }
+
+  .nav-right {
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+    margin-top: 1rem;
+    display: none;
+  }
+
+  .nav-right.open {
+    display: flex;
+  }
+
+  .nav-right a {
+    font-size: 1.8rem;
+  }
 }

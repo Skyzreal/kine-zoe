@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, NgOptimizedImage],
+  imports: [CommonModule, RouterModule],
   encapsulation: ViewEncapsulation.None,
   templateUrl: './home.html',
   styleUrls: ['./home.css']

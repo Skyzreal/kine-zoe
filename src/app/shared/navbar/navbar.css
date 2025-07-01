@@ -12,6 +12,23 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   font-family: 'Georgia', serif;
 }
+.cta {
+  background-color: #f4ec9d;
+  padding: 0.6rem 1.4rem;
+  border-radius: 30px;
+  font-weight: bold;
+  border: 1px solid black;
+  white-space: nowrap;
+  color: black;
+  transition: all 0.3s ease;
+  transform: scale(1);
+}
+
+.cta:hover {
+  color: white;
+  transform: scale(1.05);
+  border-color: #f4ec9d;
+}
 
 .nav-left, .nav-right {
   display: flex;
@@ -48,17 +65,9 @@
 }
 
 .nav-right a:hover {
-  text-decoration: underline;
+  text-decoration: None;
 }
 
-.cta {
-  background-color: #f4ec9d;
-  padding: 0.6rem 1.4rem;
-  border-radius: 30px;
-  font-weight: bold;
-  border: black solid 1px;
-  white-space: nowrap;
-}
 .hamburger {
   display: none;
   font-size: 2rem;
@@ -67,6 +76,33 @@
   cursor: pointer;
   margin-left: auto;
   padding: 0.5rem;
+}
+.nav-right a {
+  position: relative;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: black;
+  transition: color 0.3s ease;
+}
+
+.nav-right a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0%;
+  height: 2px;
+  background-color: #f4ec9d;
+  transition: width 0.3s ease;
+}
+
+.nav-right a:hover {
+  color: #222;
+}
+
+.nav-right a:hover::after {
+  width: 100%;
 }
 
 @media (max-width: 768px) {
@@ -103,5 +139,8 @@
 
   .nav-right a {
     font-size: 1.8rem;
+  }
+  .nav-right a:hover {
+    text-decoration: None;
   }
 }

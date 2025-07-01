@@ -1,0 +1,97 @@
+/* Layout Base */
+.home-container {
+  padding-top:6rem;
+  padding-left:3rem;
+  font-family: 'Georgia', serif;
+  min-height: 150vh;
+  background: #eee;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hero Section */
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 2rem;
+}
+
+.hero-text {
+  max-width: 600px;
+}
+
+.hero-text h1 {
+  font-size: 5rem;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.hero-text h3 {
+  font-size: 1.5rem;
+  margin-top: 1rem;
+  font-weight: 400;
+  color: #444;
+}
+
+.button {
+  display: inline-block;
+  margin-top: 2rem;
+  background-color: #f4ec9d;
+  padding: 0.8rem 1.5rem;
+  font-size: 1.5rem;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: bold;
+  color: black;
+}
+
+/* Image */
+.hero-photo img {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 8px solid #d5eafd;
+}
+
+.hero,
+.hero-text,
+.hero-photo {
+  position: relative;
+  z-index: 1;
+}
+
+/* Background Decorations */
+.bg-shape {
+  position: absolute;
+  z-index: 0;
+  opacity: 0.5;
+  border-radius: 50%;
+}
+
+
+.shape1 {
+  width: 500px;
+  height: 500px;
+  background: #fef6d1;
+  top: -100px;
+  left: -150px;
+}
+
+.shape2 {
+  width: 400px;
+  height: 400px;
+  background: #c7e6fb;
+  bottom: -80px;
+  right: -120px;
+}
+
+.shape3 {
+  width: 350px;
+  height: 350px;
+  background: #e0d4f5;
+  top: 200px;
+  right: 200px;
+}

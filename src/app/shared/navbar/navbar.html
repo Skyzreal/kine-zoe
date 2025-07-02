@@ -12,6 +12,8 @@
   <nav class="nav-right" [class.open]="menuOpen">
     <a routerLink="/about" routerLinkActive="active" (click)="closeMenu()">À propos de moi</a>
     <a routerLink="/contact" routerLinkActive="active" (click)="closeMenu()">Contact</a>
-    <a class="cta" routerLink="/reserver" routerLinkActive="active" (click)="closeMenu()">Réserver en ligne</a>
+    <div class="btn-wrapper">
+      <a class="cta" routerLink="/reserver">Réserver en ligne</a>
+    </div>
   </nav>
 </header>

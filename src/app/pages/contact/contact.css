@@ -1,12 +1,13 @@
 .contact-container {
   position: relative;
-  padding: 120px 5% 4rem;
+  padding: 6rem 1.5rem 4rem;
   background: #fafafa;
   font-family: 'Georgia', serif;
+  text-align: center;
 }
 
 h1 {
-  font-size: 2.5rem;
+  font-size: 2rem;
   margin-bottom: 0.5rem;
 }
 
@@ -16,8 +17,8 @@ h1 {
 }
 
 .contact-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
+  display: flex;
+  flex-direction: column;
   gap: 2rem;
   background: white;
   padding: 2rem;
@@ -79,4 +80,21 @@ h1 {
   background: #fef6d1;
   bottom: -60px;
   right: -60px;
+}
+
+@media (min-width: 769px) {
+  .contact-container {
+    padding: 120px 5% 4rem;
+    text-align: left;
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 2rem;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+  }
 }

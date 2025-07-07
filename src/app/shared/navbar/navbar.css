@@ -161,4 +161,42 @@
     color: white;
     border-color: #f4ec9d;
   }
+  @media (min-width: 769px) {
+    .nav {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      height: 80px;
+      padding: 0;
+    }
+
+    .nav-left {
+      padding-left: 3rem;
+      width: auto;
+    }
+
+    .nav-right {
+      position: static;
+      flex-direction: row;
+      align-items: center;
+      transform: none;
+      width: auto;
+      height: auto;
+      background: none;
+      box-shadow: none;
+      padding: 0;
+      gap: 2rem;
+      margin-top: 0;
+    }
+
+    .nav-right a {
+      font-size: 1.1rem;
+      text-align: center;
+    }
+
+    .cta {
+      margin-left: 1rem;
+    }
+  }
+
 }

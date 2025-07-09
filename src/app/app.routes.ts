@@ -27,11 +27,6 @@ export const routes: Routes = [
       import('./pages/services/reserver/reserver').then(m => m.ReserverComponent)
   },
   {
-    path: 'calendrier',
-    loadComponent: () =>
-      import('./pages/calendrier/calendrier').then(m => m.Calendrier),
-  },
-  {
     path: 'confirmation-info',
     loadComponent: () =>
       import('./pages/services/confirmation-info/confirmation-info').then(m => m.ConfirmationInfo),

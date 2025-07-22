@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NavbarComponent } from './shared/navbar/navbar';
+import { provideHttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',

@@ -3675,21 +3675,6 @@ var CommonModule = class _CommonModule {
   }], null, null);
 })();
 
-// node_modules/@angular/common/fesm2022/xhr.mjs
-function parseCookieValue(cookieStr, name) {
-  name = encodeURIComponent(name);
-  for (const cookie of cookieStr.split(";")) {
-    const eqIndex = cookie.indexOf("=");
-    const [cookieName, cookieValue] = eqIndex == -1 ? [cookie, ""] : [cookie.slice(0, eqIndex), cookie.slice(eqIndex + 1)];
-    if (cookieName.trim() === name) {
-      return decodeURIComponent(cookieValue);
-    }
-  }
-  return null;
-}
-var XhrFactory = class {
-};
-
 // node_modules/@angular/common/fesm2022/platform_navigation.mjs
 var PlatformNavigation = class _PlatformNavigation {
   static ɵfac = function PlatformNavigation_Factory(__ngFactoryType__) {
@@ -5139,8 +5124,6 @@ export {
   CurrencyPipe,
   SlicePipe,
   CommonModule,
-  parseCookieValue,
-  XhrFactory,
   PlatformNavigation,
   registerLocaleData2 as registerLocaleData,
   PLATFORM_BROWSER_ID,
@@ -5163,7 +5146,6 @@ export {
 
 @angular/common/fesm2022/location.mjs:
 @angular/common/fesm2022/common_module.mjs:
-@angular/common/fesm2022/xhr.mjs:
 @angular/common/fesm2022/platform_navigation.mjs:
 @angular/common/fesm2022/common.mjs:
   (**
@@ -5172,4 +5154,4 @@ export {
    * License: MIT
    *)
 */
-//# sourceMappingURL=chunk-QQ4TL63Y.js.map
+//# sourceMappingURL=chunk-VHSNDQRF.js.map

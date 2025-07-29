@@ -2,69 +2,117 @@
   <div class="bg-shape shape1"></div>
   <div class="bg-shape shape2"></div>
 
-  <h1>Réservez votre rendez-vous pour
-    <p><strong>Service:</strong> {{ selectedService || 'Non spécifié' }}</p>
-  </h1>
+  <h1>Réserver un créneau</h1>
+  <p class="subtitle">{{ selectedService }}</p>
 
-  <p class="subtitle">Choisissez une heure et une date qui vous convient</p>
-
-  <!-- Loading state -->
-  <div *ngIf="loading" class="loading-message">
+  <div *ngIf="loading" class="loading">
     <p>Chargement des créneaux disponibles...</p>
   </div>
 
-  <!-- Error state -->
-  <div *ngIf="error" class="error-message">
+  <div *ngIf="error" class="error">
     <p>{{ error }}</p>
     <button (click)="loadAvailability()" class="retry-btn">Réessayer</button>
   </div>
 
-  <!-- Main content when data is loaded -->
-  <div *ngIf="!loading && !error" class="reserver-grid">
+  <div *ngIf="!loading && !error" class="booking-interface">
+    <div *ngIf="groupedSlots.length === 0" class="no-slots">
+      <p>Aucun créneau disponible pour le moment.</p>
+    </div>
 
-    <!-- Available dates -->
-    <div class="calendar">
-      <h3>Créneaux disponibles</h3>
-      <div *ngIf="freeEvents.length === 0" class="no-slots">
-        <p>Aucun créneau libre disponible dans les 7 prochains jours.</p>
+    <div class="reserver-grid" *ngIf="groupedSlots.length > 0">
+      <div class="calendar">
+        <div class="calendar-header">
+          <button class="nav-btn prev-btn" (click)="previousMonth()">‹</button>
+          <h3>{{ currentMonthName }} {{ currentYear }}</h3>
+          <button class="nav-btn next-btn" (click)="nextMonth()">›</button>
+        </div>
+
+        <div class="calendar-weekdays">
+          <div class="weekday">Di</div>
+          <div class="weekday">Lu</div>
+          <div class="weekday">Ma</div>
+          <div class="weekday">Me</div>
+          <div class="weekday">Je</div>
+          <div class="weekday">Ve</div>
+          <div class="weekday">Sa</div>
+        </div>
+
+        <div class="calendar-grid">
+          <div
+            *ngFor="let day of calendarDays"
+            class="calendar-day"
+            [class.other-month]="day.isOtherMonth"
+            [class.has-slots]="day.hasSlots"
+            [class.selected]="day.hasSlots && isDateSelected(day.date)"
+            [class.disabled]="!day.hasSlots"
+            (click)="selectCalendarDay(day)"
+          >
+            <span class="day-number">{{ day.dayNumber }}</span>
+            <div class="availability-indicator" *ngIf="day.hasSlots">
+              <div class="slot-dot" [title]="day.slotCount + ' créneaux disponibles'"></div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div *ngIf="freeEvents.length > 0" class="calendar-grid">
-        <div
-          *ngFor="let slot of freeEvents; let i = index"
-          class="day"
-          [class.selected]="selectedSlotIndex === i"
-          (click)="selectSlot(i)">
-          {{ getDateOnly(slot.date) }}
+
+      <div class="time-slots">
+        <div *ngIf="!selectedDay">
+          <h3>Informations</h3>
+          <p>Sélectionnez d'abord une date pour voir les créneaux disponibles.</p>
+        </div>
+
+        <div *ngIf="selectedDay">
+          <h3>{{ selectedDay.fullDate }}</h3>
+          <span class="available-slots">{{ getSlotCount(selectedDay) }} disponibles</span>
+
+          <div class="time-slots-list">
+            <button
+              *ngFor="let slot of selectedDay.slots"
+              class="time-btn"
+              [class.selected]="isSlotSelected(slot)"
+              (click)="selectTimeSlot(slot)"
+            >
+              <span class="time-range">{{ getTimeRange(slot) }}</span>
+              <span class="slot-title">{{ slot.summary }}</span>
+              <span class="selection-indicator" *ngIf="isSlotSelected(slot)">✓</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Time slots for selected date -->
-    <div class="time-slots" *ngIf="selectedSlotIndex !== null">
-      <h3>{{ getFullDate(freeEvents[selectedSlotIndex].date) }}</h3>
-      <button
-        class="time-btn selected"
-        (click)="selectTimeSlot()">
-        {{ getTimeRange(freeEvents[selectedSlotIndex]) }}
+    <div *ngIf="selectedSlots.length > 0" class="selected-slots-panel">
+      <div class="selected-slots-header">
+        <h3>Créneaux sélectionnés ({{ selectedSlots.length }})</h3>
+        <button (click)="clearAllSelections()" class="clear-all-btn">Tout effacer</button>
+      </div>
+
+      <div class="selected-slots-list">
+        <div *ngFor="let slot of selectedSlots" class="selected-slot-item">
+          <div class="slot-info">
+            <span class="slot-date">{{ getFullDate(slot.date) }}</span>
+            <span class="slot-time">{{ getTimeRange(slot) }}</span>
+            <span class="slot-service">{{ slot.summary }}</span>
+          </div>
+          <button (click)="removeSelectedSlot(slot)" class="remove-slot-btn" title="Supprimer ce créneau">×</button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="selectedSlots.length > 0 && selectedDay" class="summary-box">
+      <h3>Récapitulatif de votre réservation</h3>
+      <p><strong>Service :</strong> {{ selectedService }}</p>
+      <p><strong>Nombre de créneaux :</strong> {{ selectedSlots.length }}</p>
+
+      <div class="booking-summary">
+        <div *ngFor="let slot of selectedSlots" class="booking-item">
+          <span>{{ getFullDate(slot.date) }} - {{ getTimeRange(slot) }}</span>
+        </div>
+      </div>
+
+      <button (click)="confirmBooking()" class="confirm-btn">
+        Confirmer {{ selectedSlots.length === 1 ? 'ce créneau' : 'ces créneaux' }}
       </button>
     </div>
-
-    <!-- Placeholder when no date selected -->
-    <div class="time-slots" *ngIf="selectedSlotIndex === null && freeEvents.length > 0">
-      <h3>Sélectionnez une date</h3>
-      <p>Choisissez une date pour voir les heures disponibles</p>
-    </div>
-  </div>
-
-  <!-- Summary box -->
-  <div class="summary-box" *ngIf="selectedSlotIndex !== null">
-    <h3>Votre réservation</h3>
-    <p><strong>Service:</strong> {{ selectedService || 'Non spécifié' }}</p>
-    <p><strong>Date:</strong> {{ getFullDate(freeEvents[selectedSlotIndex].date) }}</p>
-    <p><strong>Heure:</strong> {{ getTimeRange(freeEvents[selectedSlotIndex]) }}</p>
-    <p><strong>$132,22</strong></p>
-    <button class="confirm-btn" [routerLink]="['/confirmation-info']">
-      Confirmer la réservation
-    </button>
   </div>
 </div>

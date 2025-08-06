@@ -41,7 +41,6 @@ export class StripeService {
   async initializeStripe(): Promise<Stripe | null> {
     if (!this.stripe) {
       this.stripe = await loadStripe(this.envService.stripePublishableKey, {
-        // Set locale to avoid module resolution issues
         locale: 'auto'
       });
     }
@@ -90,7 +89,4 @@ export class StripeService {
 
     return response;
   }
-
-  // Calendar update and email sending are now handled server-side
-  // during payment verification for better reliability and security
 }

@@ -25,9 +25,9 @@ export class ConfirmationInfo implements OnInit {
     nom: '',
     phone: '',
     email: '',
-    service: 'Physiotherapy Session', // Set this based on selected service
-    timeSlot: '2024-01-15 10:00', // Set this from your calendar selection
-    amount: 1500 //amount (in cents)
+    service: 'Physiotherapy Session', // TODO
+    timeSlot: '2024-01-15 10:00', // TODO
+    amount: 1500 // TODO: Need to wait for how much the service costs
   };
 
   async ngOnInit() {

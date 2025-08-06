@@ -36,7 +36,7 @@ app.post('/api/create-payment-session', async (req, res) => {
                 minute: '2-digit'
               })}`,
             },
-            unit_amount: amount, // Amount in cents
+            unit_amount: amount,
           },
           quantity: 1,
         },
@@ -64,9 +64,6 @@ app.post('/api/create-payment-session', async (req, res) => {
   }
 });
 
-// Removed webhook handling - using redirect flow instead
-
-// Update calendar function - works with your existing Google Calendar setup
 async function updateCalendarSlot(clientInfo) {
   try {
     console.log('Updating calendar for:', clientInfo);
@@ -74,11 +71,9 @@ async function updateCalendarSlot(clientInfo) {
     const authClient = await auth.getClient();
     const calendarId = process.env.CALENDAR_ID;
 
-    // First, find and delete the existing "FREE" event for this time slot
     const startTime = new Date(clientInfo.timeSlot);
-    const endTime = new Date(startTime.getTime() + 60*60*1000); // Assuming 1-hour slots
+    const endTime = new Date(startTime.getTime() + 60*60*1000);
 
-    // Get events for this specific time range
     const existingEvents = await calendar.events.list({
       auth: authClient,
       calendarId,
@@ -87,7 +82,6 @@ async function updateCalendarSlot(clientInfo) {
       singleEvents: true,
     });
 
-    // Find and delete the FREE event
     const freeEvent = existingEvents.data.items?.find(event =>
       (event.summary || '').toLowerCase().includes('free')
     );
@@ -101,7 +95,6 @@ async function updateCalendarSlot(clientInfo) {
       console.log('Deleted FREE event:', freeEvent.summary);
     }
 
-    // Create the new booked event
     const calendarEvent = {
       summary: `${clientInfo.service} - ${clientInfo.name}`,
       description: `Client: ${clientInfo.name}\nEmail: ${clientInfo.email}\nPhone: ${clientInfo.phone}\nService: ${clientInfo.service}`,
@@ -133,25 +126,12 @@ async function updateCalendarSlot(clientInfo) {
   }
 }
 
-// Send confirmation email
 async function sendConfirmationEmail(clientInfo) {
-  // Use your preferred email service (SendGrid, Nodemailer, etc.)
   console.log('Sending confirmation email to:', clientInfo.email);
 
-  // Example with Nodemailer:
-  // const transporter = nodemailer.createTransporter({...});
-  // await transporter.sendMail({
-  //   to: clientInfo.email,
-  //   subject: 'Appointment Confirmation',
-  //   html: `
-  //     <h2>Appointment Confirmed!</h2>
-  //     <p>Hello ${clientInfo.name},</p>
-  //     <p>Your appointment for ${clientInfo.service} on ${clientInfo.timeSlot} has been confirmed.</p>
-  //   `
-  // });
+  // TODO: Send email using nodemail ? or other mailing service
 }
 
-// API endpoint to update calendar (called from frontend)
 app.post('/api/update-calendar', (req, res) => {
   const { timeSlot, status, service, clientInfo } = req.body;
 
@@ -167,7 +147,6 @@ app.post('/api/update-calendar', (req, res) => {
   res.json({ success: true });
 });
 
-// API endpoint to send confirmation email
 app.post('/api/send-confirmation-email', (req, res) => {
   const emailData = req.body;
 
@@ -182,7 +161,6 @@ app.post('/api/send-confirmation-email', (req, res) => {
   res.json({ success: true });
 });
 
-// Verify payment session and handle booking completion (redirect flow)
 app.get('/api/verify-payment/:sessionId', async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.retrieve(req.params.sessionId);
@@ -200,11 +178,11 @@ app.get('/api/verify-payment/:sessionId', async (req, res) => {
         // Update calendar immediately after payment verification
         await updateCalendarSlot(clientInfo);
         console.log('Calendar updated successfully for:', clientInfo.name);
-        
+
         // Send confirmation email
         await sendConfirmationEmail(clientInfo);
         console.log('Confirmation email sent to:', clientInfo.email);
-        
+
       } catch (bookingError) {
         console.error('Error processing booking after payment:', bookingError);
         // Still return success since payment was completed

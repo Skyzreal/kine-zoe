@@ -7,10 +7,19 @@
     <list default="true" id="c689c3cb-66fc-453c-a6d1-e3025d51aeef" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/.angular/cache/20.0.4/kine-zoe/.tsbuildinfo" beforeDir="false" afterPath="$PROJECT_DIR$/client/.angular/cache/20.0.4/kine-zoe/.tsbuildinfo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/app/pages/services/reserver/reserver.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/pages/services/reserver/reserver.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/.angular/cache/20.0.4/kine-zoe/vite/deps/_metadata.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/.angular/cache/20.0.4/kine-zoe/vite/deps/_metadata.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/.angular/cache/20.0.4/kine-zoe/vite/deps_ssr/_metadata.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/.angular/cache/20.0.4/kine-zoe/vite/deps_ssr/_metadata.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/node_modules/.package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/node_modules/.package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/app/app.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/app.routes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/app/pages/services/confirmation-info/confirmation-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/pages/services/confirmation-info/confirmation-info.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/app/pages/services/confirmation-info/confirmation-info.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/pages/services/confirmation-info/confirmation-info.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/app/pages/services/reserver/reserver.html" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/pages/services/reserver/reserver.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/app/pages/services/reserver/reserver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/pages/services/reserver/reserver.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/node_modules/.package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/server/node_modules/.package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/server/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/server/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,6 +50,7 @@
   &quot;keyToString&quot;: {
     &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Node.js.index.js.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
@@ -95,7 +105,10 @@
       <workItem from="1753132059317" duration="6639000" />
       <workItem from="1753186928951" duration="116000" />
       <workItem from="1753205882812" duration="776000" />
-      <workItem from="1753732274157" duration="6180000" />
+      <workItem from="1753732274157" duration="13188000" />
+      <workItem from="1754309349841" duration="4247000" />
+      <workItem from="1754477846352" duration="3257000" />
+      <workItem from="1754494201163" duration="1947000" />
     </task>
     <servers />
   </component>

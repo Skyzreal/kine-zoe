@@ -1,23 +1,49 @@
-import { Component } from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import { Component, OnInit, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
+import { StripeService, ClientInfo } from '../../../shared/services/stripe.service';
+
 @Component({
   selector: 'app-confirmation-info',
   standalone: true,
   templateUrl: './confirmation-info.html',
   styleUrls: ['./confirmation-info.css'],
   imports: [
-    FormsModule, CommonModule
+    FormsModule, CommonModule, HttpClientModule
   ]
 })
-export class ConfirmationInfo {
-  formSubmitted = false;
+export class ConfirmationInfo implements OnInit {
+  private stripeService = inject(StripeService);
 
-  submitForm() {
-    this.formSubmitted = true;
-    // TODO: Paiement se ferait ici également, après que l'option de payer soit là
-    // LOOK INTO Stripe: https://docs.stripe.com/checkout/quickstart
-    // TODO: quand le form est soumit, trigger envoyer un courriel et confirmation
-    // LOOK INTO: EmailJS: https://www.emailjs.com/
+  formSubmitted = false;
+  isProcessingPayment = false;
+  paymentError = '';
+
+  clientInfo: ClientInfo = {
+    prenom: '',
+    nom: '',
+    phone: '',
+    email: '',
+    service: 'Physiotherapy Session', // Set this based on selected service
+    timeSlot: '2024-01-15 10:00', // Set this from your calendar selection
+    amount: 1500 //amount (in cents)
+  };
+
+  async ngOnInit() {
+  }
+
+  async submitForm() {
+    this.isProcessingPayment = true;
+    this.paymentError = '';
+
+    try {
+      const session = await this.stripeService.createPaymentSession(this.clientInfo);
+      await this.stripeService.redirectToCheckout(session.sessionId);
+    } catch (error: any) {
+      console.error('Payment error:', error);
+      this.paymentError = error.message || 'Failed to process payment';
+      this.isProcessingPayment = false;
+    }
   }
 }

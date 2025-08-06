@@ -9,22 +9,71 @@
     <p class="form-note">Tous les champs sont obligatoires</p>
 
     <label>Prénom</label>
-    <input name="prenom" ngModel required placeholder="Placeholder" />
+    <input
+      name="prenom"
+      [(ngModel)]="clientInfo.prenom"
+      required
+      placeholder="Votre prénom"
+    />
 
     <label>Nom</label>
-    <input name="nom" ngModel required placeholder="Placeholder" />
+    <input
+      name="nom"
+      [(ngModel)]="clientInfo.nom"
+      required
+      placeholder="Votre nom"
+    />
 
     <label>Numéro de téléphone</label>
-    <input name="phone" ngModel required placeholder="Placeholder" />
+    <input
+      name="phone"
+      [(ngModel)]="clientInfo.phone"
+      required
+      placeholder="(514) 123-4567"
+    />
 
     <label>E-mail</label>
-    <input name="email" ngModel type="email" required placeholder="Placeholder" />
+    <input
+      name="email"
+      [(ngModel)]="clientInfo.email"
+      type="email"
+      required
+      placeholder="votre@email.com"
+    />
 
-    <button type="submit">Soumettre</button>
+    <!-- Display selected service and time slot -->
+    <div class="booking-summary">
+      <h3>Résumé de votre réservation</h3>
+      <p><strong>Service:</strong> {{ clientInfo.service }}</p>
+      <p><strong>Date et heure:</strong> {{ clientInfo.timeSlot }}</p>
+      <p><strong>Prix:</strong> {{ (clientInfo.amount || 0) / 100 | currency:'CAD':'symbol':'1.2-2' }}</p>
+    </div>
+
+    <!-- Error message -->
+    <div class="error-message" *ngIf="paymentError">
+      {{ paymentError }}
+    </div>
+
+    <button
+      type="submit"
+      [disabled]="!userForm.valid || isProcessingPayment"
+      class="submit-btn"
+    >
+      <span *ngIf="!isProcessingPayment">Procéder au paiement</span>
+      <span *ngIf="isProcessingPayment">Traitement en cours...</span>
+    </button>
   </form>
 </div>
 
 <div class="thank-you" *ngIf="formSubmitted">
   <h2>Merci pour votre réservation !</h2>
+  <p>Votre paiement a été traité avec succès.</p>
   <p>Vous recevrez un courriel de confirmation sous peu.</p>
+
+  <div class="confirmation-details">
+    <h3>Détails de votre rendez-vous</h3>
+    <p><strong>Service:</strong> {{ clientInfo.service }}</p>
+    <p><strong>Date et heure:</strong> {{ clientInfo.timeSlot }}</p>
+    <p><strong>Client:</strong> {{ clientInfo.prenom }} {{ clientInfo.nom }}</p>
+  </div>
 </div>

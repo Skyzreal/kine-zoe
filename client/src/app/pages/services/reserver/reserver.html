@@ -110,7 +110,7 @@
         </div>
       </div>
 
-      <button (click)="confirmBooking()" class="confirm-btn">
+      <button routerLink="/confirmer" (click)="confirmBooking()" class="confirm-btn">
         Confirmer {{ selectedSlots.length === 1 ? 'ce créneau' : 'ces créneaux' }}
       </button>
     </div>

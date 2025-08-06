@@ -1,0 +1,31 @@
+<div class="cancel-container">
+  <div class="cancel-content">
+    <div class="cancel-icon">✕</div>
+    <h1>Paiement annulé</h1>
+    <p class="cancel-message">
+      Votre paiement a été annulé. Aucun frais n'a été prélevé sur votre compte.
+    </p>
+    
+    <div class="info-box">
+      <h3>Que s'est-il passé?</h3>
+      <p>
+        Vous avez choisi d'annuler le processus de paiement avant sa finalisation. 
+        Votre réservation n'a pas été confirmée.
+      </p>
+    </div>
+
+    <div class="next-steps">
+      <h3>Que faire maintenant?</h3>
+      <ul>
+        <li>Vous pouvez essayer de nouveau si c'était une erreur</li>
+        <li>Contactez-nous si vous rencontrez des difficultés techniques</li>
+        <li>Explorez d'autres créneaux horaires disponibles</li>
+      </ul>
+    </div>
+
+    <div class="action-buttons">
+      <button (click)="tryAgain()" class="btn-primary">Essayer de nouveau</button>
+      <button (click)="goHome()" class="btn-secondary">Retour à l'accueil</button>
+    </div>
+  </div>
+</div>

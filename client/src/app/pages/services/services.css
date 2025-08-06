@@ -34,7 +34,15 @@
 
 .service-card img {
   width: 50px;
+  height: 50px;
   margin-bottom: 1rem;
+  object-fit: contain;
+}
+
+.service-icon {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 1rem;
 }
 
 .service-card h3 {
@@ -56,15 +64,24 @@
   text-decoration: none;
   border: 1px solid black;
   color: black;
+  display: inline-block;
+  cursor: pointer;
 }
 
-.pastel-blue    { background-color: #e0efff; }
-.pastel-yellow  { background-color: #fffacc; }
-.pastel-pink    { background-color: #ffe5eb; }
-.pastel-purple  { background-color: #f0eaff; }
-.pastel-green   { background-color: #e7ffe4; }
-.pastel-orange  { background-color: #fff1cc; }
+.service-card .btn:hover {
+  background-color: #f0e693;
+}
 
+/* Couleurs pastel */
+.pastel-blue { background-color: #e0efff; }
+.pastel-yellow { background-color: #fffacc; }
+.pastel-pink { background-color: #ffe5eb; }
+.pastel-purple { background-color: #f0eaff; }
+.pastel-green { background-color: #e7ffe4; }
+.pastel-orange { background-color: #fff1cc; }
+.pastel-mint { background-color: #e1f5f0; }
+
+/* Formes d'arrière-plan */
 .bg-shape {
   position: absolute;
   z-index: 0;
@@ -88,6 +105,43 @@
   right: -80px;
 }
 
+/* Icônes SVG */
+.icon-fitness {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7.5 7.5h0m9 0h0m-9 9h0m9 0h0M9 12h6m-3-3v6"/></svg>') no-repeat center;
+  background-size: contain;
+}
+
+.icon-rehab {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>') no-repeat center;
+  background-size: contain;
+}
+
+.icon-muscle {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>') no-repeat center;
+  background-size: contain;
+}
+
+.icon-prep {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>') no-repeat center;
+  background-size: contain;
+}
+
+.icon-weight {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18m-4-8h8m-8 0a4 4 0 118 0m-8 0a4 4 0 00-8 0"/></svg>') no-repeat center;
+  background-size: contain;
+}
+
+.icon-pain {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>') no-repeat center;
+  background-size: contain;
+}
+
+.icon-massage {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 2a3 3 0 000 6h6a3 3 0 100-6M6 8h12v12a2 2 0 01-2 2H8a2 2 0 01-2-2V8z"/><path d="M9 12h6m-6 4h6"/></svg>') no-repeat center;
+  background-size: contain;
+}
+
+/* Responsive Design */
 @media (min-width: 769px) {
   .services-container {
     padding: 120px 5% 4rem;
@@ -101,7 +155,9 @@
 
   .services-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
   }
 }

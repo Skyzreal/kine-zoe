@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const { google } = require('googleapis');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const nodemailer = require('nodemailer');
 
 const app = express();
 app.use(cors());
@@ -12,12 +13,31 @@ app.use(express.json());
 const calendar = google.calendar('v3');
 const auth = new google.auth.GoogleAuth({
   keyFile: './service-account.json',
-  scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
+  scopes: ['https://www.googleapis.com/auth/calendar'],
+});
+
+const transporter = nodemailer.createTransport({
+  service: 'hotmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD
+  }
 });
 
 app.post('/api/create-payment-session', async (req, res) => {
   try {
-    const { clientInfo, amount, currency, service, timeSlot } = req.body;
+    const { clientInfo, amount, currency, service, timeSlot, timeSlotEnd } = req.body;
+
+    const now = new Date();
+    const oneMonthLater = new Date();
+    oneMonthLater.setMonth(now.getMonth() + 1);
+    const selectedDate = new Date(timeSlot);
+
+    if (selectedDate > oneMonthLater) {
+      return res.status(400).json({
+        error: 'Bookings can only be made up to one month in advance'
+      });
+    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -50,7 +70,8 @@ app.post('/api/create-payment-session', async (req, res) => {
         client_phone: clientInfo.phone,
         client_email: clientInfo.email,
         service: service,
-        time_slot: timeSlot
+        time_slot: timeSlot,
+        time_slot_end: timeSlotEnd
       }
     });
 
@@ -67,24 +88,48 @@ app.post('/api/create-payment-session', async (req, res) => {
 async function updateCalendarSlot(clientInfo) {
   try {
     console.log('Updating calendar for:', clientInfo);
+    console.log('timeSlotEnd received:', clientInfo.timeSlotEnd);
 
     const authClient = await auth.getClient();
     const calendarId = process.env.CALENDAR_ID;
 
     const startTime = new Date(clientInfo.timeSlot);
-    const endTime = new Date(startTime.getTime() + 60*60*1000);
+    console.log('Parsed start time:', startTime.toISOString());
+    console.log('Raw timeSlotEnd value:', clientInfo.timeSlotEnd);
+    
+    let endTime;
+    if (clientInfo.timeSlotEnd && clientInfo.timeSlotEnd !== clientInfo.timeSlot) {
+      endTime = new Date(clientInfo.timeSlotEnd);
+      console.log('Using provided end time:', endTime.toISOString());
+    } else {
+      endTime = new Date(startTime.getTime() + 60*60*1000);
+      console.log('Using default 1-hour duration, end time:', endTime.toISOString());
+    }
 
+    const searchStartTime = new Date(startTime.getTime() - 60000);
+    const searchEndTime = new Date(endTime.getTime() + 60000);
+    console.log('Searching for existing events between:', searchStartTime.toISOString(), 'and', searchEndTime.toISOString());
+    
     const existingEvents = await calendar.events.list({
       auth: authClient,
       calendarId,
-      timeMin: startTime.toISOString(),
-      timeMax: endTime.toISOString(),
+      timeMin: searchStartTime.toISOString(),
+      timeMax: searchEndTime.toISOString(),
       singleEvents: true,
     });
 
     const freeEvent = existingEvents.data.items?.find(event =>
       (event.summary || '').toLowerCase().includes('free')
     );
+    
+    const existingClientEvent = existingEvents.data.items?.find(event =>
+      (event.summary || '').includes(clientInfo.name)
+    );
+    
+    if (existingClientEvent) {
+      console.log('Appointment already exists for this client at this time:', existingClientEvent.summary);
+      return existingClientEvent;
+    }
 
     if (freeEvent) {
       await calendar.events.delete({
@@ -105,10 +150,7 @@ async function updateCalendarSlot(clientInfo) {
       end: {
         dateTime: endTime.toISOString(),
         timeZone: 'America/Toronto',
-      },
-      attendees: [
-        { email: clientInfo.email }
-      ]
+      }
     };
 
     const result = await calendar.events.insert({
@@ -127,9 +169,88 @@ async function updateCalendarSlot(clientInfo) {
 }
 
 async function sendConfirmationEmail(clientInfo) {
-  console.log('Sending confirmation email to:', clientInfo.email);
+  try {
+    console.log('Sending confirmation email to:', clientInfo.email);
 
-  // TODO: Send email using nodemail ? or other mailing service
+    const appointmentDate = new Date(clientInfo.timeSlot);
+    const formattedDate = appointmentDate.toLocaleDateString('fr-CA', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    const formattedTime = appointmentDate.toLocaleTimeString('fr-CA', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+        <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+          <h1 style="color: #2c3e50; text-align: center; margin-bottom: 30px;">
+            ✅ Réservation Confirmée
+          </h1>
+
+          <p style="font-size: 16px; color: #555; margin-bottom: 20px;">
+            Bonjour <strong>${clientInfo.name}</strong>,
+          </p>
+
+          <p style="font-size: 16px; color: #555; margin-bottom: 25px;">
+            Votre réservation a été confirmée avec succès ! Voici les détails de votre rendez-vous :
+          </p>
+
+          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #28a745;">
+            <h3 style="color: #28a745; margin-top: 0;">Détails de la réservation</h3>
+            <p style="margin: 8px 0;"><strong>Service :</strong> ${clientInfo.service}</p>
+            <p style="margin: 8px 0;"><strong>Date :</strong> ${formattedDate}</p>
+            <p style="margin: 8px 0;"><strong>Heure :</strong> ${formattedTime}</p>
+            <p style="margin: 8px 0;"><strong>Client :</strong> ${clientInfo.name}</p>
+            <p style="margin: 8px 0;"><strong>Téléphone :</strong> ${clientInfo.phone}</p>
+          </div>
+
+          <div style="background-color: #e3f2fd; padding: 15px; border-radius: 8px; margin: 25px 0;">
+            <h4 style="color: #1976d2; margin-top: 0;">Informations importantes :</h4>
+            <ul style="color: #555; margin: 10px 0;">
+              <li>Veuillez arriver 5 minutes avant votre rendez-vous</li>
+              <li>N'hésitez pas à nous contacter si vous avez des questions</li>
+              <li>En cas d'annulation, merci de nous prévenir au moins 24h à l'avance</li>
+            </ul>
+          </div>
+
+          <div style="text-align: center; margin-top: 30px;">
+            <p style="color: #777; font-size: 14px;">
+              Cet événement a été automatiquement ajouté à votre calendrier.
+            </p>
+            <p style="color: #777; font-size: 14px;">
+              Merci de votre confiance !
+            </p>
+          </div>
+
+          <hr style="border: none; height: 1px; background-color: #eee; margin: 30px 0;">
+
+          <div style="text-align: center; color: #999; font-size: 12px;">
+            <p>Cet email de confirmation a été envoyé automatiquement.</p>
+            <p>Si vous avez des questions, répondez à cet email.</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: clientInfo.email,
+      subject: `Confirmation de rendez-vous - ${clientInfo.service} - ${formattedDate}`,
+      html: emailHtml
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully:', info.messageId);
+    return true;
+  } catch (error) {
+    console.error('Error sending confirmation email:', error);
+    throw error;
+  }
 }
 
 app.post('/api/update-calendar', (req, res) => {
@@ -171,7 +292,8 @@ app.get('/api/verify-payment/:sessionId', async (req, res) => {
         email: session.metadata.client_email,
         phone: session.metadata.client_phone,
         service: session.metadata.service,
-        timeSlot: session.metadata.time_slot
+        timeSlot: session.metadata.time_slot,
+        timeSlotEnd: session.metadata.time_slot_end
       };
 
       try {
@@ -180,8 +302,7 @@ app.get('/api/verify-payment/:sessionId', async (req, res) => {
         console.log('Calendar updated successfully for:', clientInfo.name);
 
         // Send confirmation email
-        await sendConfirmationEmail(clientInfo);
-        console.log('Confirmation email sent to:', clientInfo.email);
+        console.log('Skipping email sending for now due to authentication issue');
 
       } catch (bookingError) {
         console.error('Error processing booking after payment:', bookingError);
@@ -225,19 +346,18 @@ app.get('/availability', async (req, res) => {
     startDate.setDate(now.getDate() + 2);
     startDate.setHours(0, 0, 0, 0);
 
-    const nextMonth = new Date();
-    nextMonth.setMonth(now.getMonth() + 1);
-    nextMonth.setDate(new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0).getDate());
-    nextMonth.setHours(23, 59, 59, 999);
+    const oneMonthLater = new Date();
+    oneMonthLater.setMonth(now.getMonth() + 1);
+    oneMonthLater.setHours(23, 59, 59, 999);
 
     console.log('Making calendar API request...');
-    console.log('Time range (with 2-day notice):', startDate.toISOString(), 'to', nextMonth.toISOString());
+    console.log('Time range (with 2-day notice):', startDate.toISOString(), 'to', oneMonthLater.toISOString());
 
     const response = await calendar.events.list({
       auth: authClient,
       calendarId,
       timeMin: startDate.toISOString(),
-      timeMax: nextMonth.toISOString(),
+      timeMax: oneMonthLater.toISOString(),
       singleEvents: true,
       orderBy: 'startTime',
       maxResults: 2500,
@@ -257,7 +377,6 @@ app.get('/availability', async (req, res) => {
 
     console.log('Free slots found:', freeSlots.length);
 
-    // Log some sample dates for debugging
     if (freeSlots.length > 0) {
       console.log('Sample slots:');
       freeSlots.slice(0, 5).forEach((slot, index) => {
@@ -288,10 +407,11 @@ app.get('/availability', async (req, res) => {
   }
 });
 
-// optional endpoint for custom range
+// optional endpoint for custom range (limited to 1 month maximum)
 app.get('/availability/:months', async (req, res) => {
   const calendarId = process.env.CALENDAR_ID;
-  const monthsAhead = parseInt(req.params.months) || 1;
+  const requestedMonths = parseInt(req.params.months) || 1;
+  const monthsAhead = Math.min(requestedMonths, 1); // Enforce maximum of 1 month
 
   try {
     const authClient = await auth.getClient();
@@ -303,7 +423,6 @@ app.get('/availability/:months', async (req, res) => {
 
     const futureDate = new Date();
     futureDate.setMonth(now.getMonth() + monthsAhead);
-    futureDate.setDate(new Date(futureDate.getFullYear(), futureDate.getMonth() + 1, 0).getDate());
     futureDate.setHours(23, 59, 59, 999);
 
     console.log(`Getting availability for ${monthsAhead} month(s) ahead (with 2-day notice)`);

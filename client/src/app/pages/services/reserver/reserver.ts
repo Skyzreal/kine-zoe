@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { GoogleCalendarService } from '../../../shared/services/google-calendar.service';
+import { BookingService } from '../../../shared/services/booking.service';
 import { CommonModule } from '@angular/common';
 
 interface TimeSlot {
@@ -47,7 +48,9 @@ export class ReserverComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private calendarService: GoogleCalendarService
+    private router: Router,
+    private calendarService: GoogleCalendarService,
+    private bookingService: BookingService
   ) {
     this.updateCurrentMonthName();
   }
@@ -131,9 +134,16 @@ export class ReserverComponent implements OnInit {
   }
 
   nextMonth() {
-    this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-    this.updateCurrentMonthName();
-    this.generateCalendarDays();
+    const now = new Date();
+    const oneMonthFromNow = new Date();
+    oneMonthFromNow.setMonth(now.getMonth() + 1);
+    
+    // Don't allow navigation beyond one month from current date
+    if (this.currentDate.getMonth() < oneMonthFromNow.getMonth() || this.currentDate.getFullYear() < oneMonthFromNow.getFullYear()) {
+      this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+      this.updateCurrentMonthName();
+      this.generateCalendarDays();
+    }
   }
 
   selectCalendarDay(day: CalendarDay) {
@@ -202,6 +212,8 @@ export class ReserverComponent implements OnInit {
   confirmBooking() {
     if (this.selectedSlots.length > 0) {
       console.log('Booking confirmed for slots:', this.selectedSlots);
+      this.bookingService.setSelectedSlots(this.selectedSlots, this.selectedService || 'Physiotherapy Session');
+      this.router.navigate(['/confirmer']);
     }
   }
 
@@ -258,5 +270,13 @@ export class ReserverComponent implements OnInit {
   getSlotCount(day: DaySlots): string {
     const count = day.slots.length;
     return count === 1 ? '1 créneau' : `${count} créneaux`;
+  }
+
+  canNavigateToNextMonth(): boolean {
+    const now = new Date();
+    const oneMonthFromNow = new Date();
+    oneMonthFromNow.setMonth(now.getMonth() + 1);
+    
+    return (this.currentDate.getMonth() < oneMonthFromNow.getMonth() || this.currentDate.getFullYear() < oneMonthFromNow.getFullYear());
   }
 }

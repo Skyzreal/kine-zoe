@@ -72,7 +72,6 @@
   background-color: #f0e693;
 }
 
-/* Couleurs pastel */
 .pastel-blue { background-color: #e0efff; }
 .pastel-yellow { background-color: #fffacc; }
 .pastel-pink { background-color: #ffe5eb; }
@@ -81,7 +80,6 @@
 .pastel-orange { background-color: #fff1cc; }
 .pastel-mint { background-color: #e1f5f0; }
 
-/* Formes d'arrière-plan */
 .bg-shape {
   position: absolute;
   z-index: 0;
@@ -141,7 +139,7 @@
   background-size: contain;
 }
 
-/* Responsive Design */
+
 @media (min-width: 769px) {
   .services-container {
     padding: 120px 5% 4rem;

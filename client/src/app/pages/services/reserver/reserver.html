@@ -24,7 +24,7 @@
         <div class="calendar-header">
           <button class="nav-btn prev-btn" (click)="previousMonth()">‹</button>
           <h3>{{ currentMonthName }} {{ currentYear }}</h3>
-          <button class="nav-btn next-btn" (click)="nextMonth()">›</button>
+          <button class="nav-btn next-btn" (click)="nextMonth()" [disabled]="!canNavigateToNextMonth()">›</button>
         </div>
 
         <div class="calendar-weekdays">
@@ -110,7 +110,7 @@
         </div>
       </div>
 
-      <button routerLink="/confirmer" (click)="confirmBooking()" class="confirm-btn">
+      <button (click)="confirmBooking()" class="confirm-btn">
         Confirmer {{ selectedSlots.length === 1 ? 'ce créneau' : 'ces créneaux' }}
       </button>
     </div>

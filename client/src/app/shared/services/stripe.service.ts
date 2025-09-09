@@ -10,6 +10,7 @@ export interface ClientInfo {
   email: string;
   service?: string;
   timeSlot?: string;
+  timeSlotEnd?: string;
   amount?: number;
 }
 
@@ -55,7 +56,8 @@ export class StripeService {
         amount: clientInfo.amount || 10000, // Default to $100 CAD
         currency: 'cad',
         service: clientInfo.service,
-        timeSlot: clientInfo.timeSlot
+        timeSlot: clientInfo.timeSlot,
+        timeSlotEnd: clientInfo.timeSlotEnd
       }
     ).toPromise();
 

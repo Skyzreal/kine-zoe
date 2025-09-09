@@ -2,7 +2,9 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { StripeService, ClientInfo } from '../../../shared/services/stripe.service';
+import { BookingService } from '../../../shared/services/booking.service';
 
 @Component({
   selector: 'app-confirmation-info',
@@ -15,22 +17,34 @@ import { StripeService, ClientInfo } from '../../../shared/services/stripe.servi
 })
 export class ConfirmationInfo implements OnInit {
   private stripeService = inject(StripeService);
+  private router = inject(Router);
+  private bookingService = inject(BookingService);
 
   formSubmitted = false;
   isProcessingPayment = false;
   paymentError = '';
+  selectedSlots: any[] = [];
 
   clientInfo: ClientInfo = {
     prenom: '',
     nom: '',
     phone: '',
     email: '',
-    service: 'Physiotherapy Session', // TODO
-    timeSlot: '2024-01-15 10:00', // TODO
-    amount: 1500 // TODO: Need to wait for how much the service costs
+    service: 'Physiotherapy Session',
+    timeSlot: '',
+    timeSlotEnd: '',
+    amount: 1500
   };
 
   async ngOnInit() {
+    if (this.bookingService.hasSelectedSlots()) {
+      this.selectedSlots = this.bookingService.getSelectedSlots();
+      this.clientInfo.service = this.bookingService.getSelectedService();
+      this.clientInfo.timeSlot = this.selectedSlots[0]?.date || '';
+      this.clientInfo.timeSlotEnd = this.selectedSlots[0]?.end || '';
+    } else {
+      this.router.navigate(['/reserver']);
+    }
   }
 
   async submitForm() {

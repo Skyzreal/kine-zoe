@@ -40,9 +40,48 @@
 }
 
 .service-icon {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  padding: 8px;
+  transition: all 0.3s ease;
+}
+
+.service-icon:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.service-icon svg {
+  width: 40px;
+  height: 40px;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.pastel-blue .service-icon svg {
+  color: #2563eb;
+}
+
+.pastel-yellow .service-icon svg {
+  color: #f59e0b;
+}
+
+.pastel-orange .service-icon svg {
+  color: #ea580c;
+}
+
+.pastel-mint .service-icon svg {
+  color: #059669;
+}
+
+.service-card:hover .service-icon svg {
+  transform: scale(1.1);
 }
 
 .service-card h3 {

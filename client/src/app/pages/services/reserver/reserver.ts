@@ -34,6 +34,7 @@ interface CalendarDay {
 })
 export class ReserverComponent implements OnInit {
   selectedService: string | null = null;
+  serviceInfo: {title: string, description: string, icon: string, color: string} | null = null;
   freeEvents: TimeSlot[] = [];
   groupedSlots: DaySlots[] = [];
   calendarDays: CalendarDay[] = [];
@@ -58,9 +59,41 @@ export class ReserverComponent implements OnInit {
   ngOnInit() {
     this.route.queryParamMap.subscribe(params => {
       this.selectedService = params.get('service');
+      this.setServiceInfo();
     });
 
     this.loadAvailability();
+  }
+
+  setServiceInfo() {
+    const serviceInfoMap: {[key: string]: {title: string, description: string, icon: string, color: string}} = {
+      'Remise en forme': {
+        title: 'Remise en forme',
+        description: 'Retrouvez votre énergie et votre confiance grâce à un programme d\'entraînement personnalisé adapté à vos besoins. Nous vous accompagnons dans votre parcours de remise en forme avec des exercices ciblés et progressifs.',
+        icon: '🏋️',
+        color: 'pastel-blue'
+      },
+      'Réhabilitation': {
+        title: 'Réhabilitation',
+        description: 'Récupérez pleinement après une blessure ou une intervention chirurgicale. Nos programmes de rééducation personnalisés vous aident à retrouver votre mobilité et à prévenir les récidives.',
+        icon: '🔄',
+        color: 'pastel-yellow'
+      },
+      'Gestion des douleurs': {
+        title: 'Prévention et gestion de douleurs',
+        description: 'Soulagez vos douleurs chroniques et tensions grâce à notre approche thérapeutique active. Nous vous donnons les outils pour mieux gérer et prévenir les douleurs au quotidien.',
+        icon: '🛡️',
+        color: 'pastel-orange'
+      },
+      'Massage': {
+        title: 'Massage thérapeutique',
+        description: 'Détendez-vous profondément et relâchez vos tensions musculaires avec nos massages thérapeutiques personnalisés. Une approche holistique pour votre bien-être physique et mental.',
+        icon: '🤲',
+        color: 'pastel-mint'
+      }
+    };
+
+    this.serviceInfo = this.selectedService ? serviceInfoMap[this.selectedService] || null : null;
   }
 
   loadAvailability() {

@@ -2,8 +2,16 @@
   <div class="bg-shape shape1"></div>
   <div class="bg-shape shape2"></div>
 
-  <h1>Réserver un créneau</h1>
-  <p class="subtitle">{{ selectedService }}</p>
+  <div *ngIf="serviceInfo" class="service-header" [ngClass]="serviceInfo.color">
+    <div class="service-icon">{{ serviceInfo.icon }}</div>
+    <h1>{{ serviceInfo.title }}</h1>
+    <p class="service-description">{{ serviceInfo.description }}</p>
+  </div>
+
+  <div *ngIf="!serviceInfo" class="default-header">
+    <h1>Réserver un créneau</h1>
+    <p class="subtitle">{{ selectedService }}</p>
+  </div>
 
   <div *ngIf="loading" class="loading">
     <p>Chargement des créneaux disponibles...</p>

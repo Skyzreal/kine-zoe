@@ -457,10 +457,49 @@ app.get('/availability/:months', async (req, res) => {
   }
 });
 
+app.post('/api/contact', async (req, res) => {
+  try {
+    const { name, email, message } = req.body;
+
+    if (!name || !email || !message) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: 'skyzbelow@gmail.com',
+      subject: `Contact Form Submission from ${name}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #2c3e50;">New Contact Form Submission</h2>
+          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <p><strong>Name:</strong> ${name}</p>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Message:</strong></p>
+            <p style="background-color: white; padding: 15px; border-radius: 5px; margin-top: 10px;">${message}</p>
+          </div>
+          <hr style="border: none; height: 1px; background-color: #eee; margin: 20px 0;">
+          <p style="color: #777; font-size: 12px;">This message was sent from the contact form on your website.</p>
+        </div>
+      `,
+      replyTo: email
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log('Contact form email sent successfully');
+
+    res.json({ success: true, message: 'Email sent successfully' });
+  } catch (error) {
+    console.error('Error sending contact form email:', error);
+    res.status(500).json({ error: 'Failed to send email' });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
   console.log(`Available endpoints:`);
   console.log(`  GET /availability - Next month's availability`);
   console.log(`  GET /availability/:months - Custom months ahead`);
+  console.log(`  POST /api/contact - Send contact form email`);
 });

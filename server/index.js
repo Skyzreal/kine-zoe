@@ -160,6 +160,32 @@ async function updateCalendarSlot(clientInfo) {
     });
 
     console.log('Calendar event created:', result.data.htmlLink);
+
+    const bufferStartTime = new Date(endTime);
+    const bufferEndTime = new Date(endTime.getTime() + 15*60*1000);
+
+    const bufferEvent = {
+      summary: 'Préparation',
+      description: 'Temps de préparation entre rendez-vous',
+      start: {
+        dateTime: bufferStartTime.toISOString(),
+        timeZone: 'America/Toronto',
+      },
+      end: {
+        dateTime: bufferEndTime.toISOString(),
+        timeZone: 'America/Toronto',
+      },
+      transparency: 'opaque'
+    };
+
+    await calendar.events.insert({
+      auth: authClient,
+      calendarId,
+      resource: bufferEvent,
+    });
+
+    console.log('15-minute buffer event created');
+
     return result.data;
 
   } catch (error) {

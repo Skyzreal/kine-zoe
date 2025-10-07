@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { GoogleCalendarService } from '../../../shared/services/google-calendar.service';
-import { BookingService } from '../../../shared/services/booking.service';
+import { BookingService, ServiceDuration } from '../../../shared/services/booking.service';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 interface TimeSlot {
   date: string;
@@ -30,11 +31,11 @@ interface CalendarDay {
   standalone: true,
   templateUrl: './reserver.html',
   styleUrl: './reserver.css',
-  imports: [RouterLink, CommonModule]
+  imports: [RouterLink, CommonModule, FormsModule]
 })
 export class ReserverComponent implements OnInit {
   selectedService: string | null = null;
-  serviceInfo: {title: string, description: string, icon: string, color: string} | null = null;
+  serviceInfo: {title: string, description: string, icon: string, color: string, price?: number, duration?: number} | null = null;
   freeEvents: TimeSlot[] = [];
   groupedSlots: DaySlots[] = [];
   calendarDays: CalendarDay[] = [];
@@ -42,6 +43,14 @@ export class ReserverComponent implements OnInit {
   error: string | null = null;
   selectedDay: DaySlots | null = null;
   selectedSlots: TimeSlot[] = [];
+
+  selectedDuration: number = 60;
+  massageDurations = [
+    { duration: 45, price: 7500, label: '45 minutes - 75$' },
+    { duration: 60, price: 11000, label: '60 minutes - 110$' },
+    { duration: 75, price: 12000, label: '75 minutes - 120$' },
+    { duration: 90, price: 14000, label: '90 minutes - 140$' }
+  ];
 
   currentDate: Date = new Date();
   currentYear: number = new Date().getFullYear();
@@ -66,24 +75,30 @@ export class ReserverComponent implements OnInit {
   }
 
   setServiceInfo() {
-    const serviceInfoMap: {[key: string]: {title: string, description: string, icon: string, color: string}} = {
+    const serviceInfoMap: {[key: string]: {title: string, description: string, icon: string, color: string, price?: number, duration?: number}} = {
       'Remise en forme': {
         title: 'Remise en forme',
         description: 'Retrouvez votre énergie et votre confiance grâce à un programme d\'entraînement personnalisé adapté à vos besoins. Nous vous accompagnons dans votre parcours de remise en forme avec des exercices ciblés et progressifs.',
         icon: '🏋️',
-        color: 'pastel-blue'
+        color: 'pastel-blue',
+        price: 12000,
+        duration: 30
       },
       'Réhabilitation': {
         title: 'Réhabilitation',
         description: 'Récupérez pleinement après une blessure ou une intervention chirurgicale. Nos programmes de rééducation personnalisés vous aident à retrouver votre mobilité et à prévenir les récidives.',
         icon: '🔄',
-        color: 'pastel-yellow'
+        color: 'pastel-yellow',
+        price: 12000,
+        duration: 30
       },
       'Gestion des douleurs': {
         title: 'Prévention et gestion de douleurs',
         description: 'Soulagez vos douleurs chroniques et tensions grâce à notre approche thérapeutique active. Nous vous donnons les outils pour mieux gérer et prévenir les douleurs au quotidien.',
         icon: '🛡️',
-        color: 'pastel-orange'
+        color: 'pastel-orange',
+        price: 12000,
+        duration: 30
       },
       'Massage': {
         title: 'Massage thérapeutique',
@@ -94,6 +109,25 @@ export class ReserverComponent implements OnInit {
     };
 
     this.serviceInfo = this.selectedService ? serviceInfoMap[this.selectedService] || null : null;
+  }
+
+  isMassageService(): boolean {
+    return this.selectedService === 'Massage';
+  }
+
+  getSelectedPrice(): number {
+    if (this.isMassageService()) {
+      const selected = this.massageDurations.find(d => d.duration === this.selectedDuration);
+      return selected ? selected.price : 11000;
+    }
+    return this.serviceInfo?.price || 12000;
+  }
+
+  canSelectMoreSlots(): boolean {
+    if (!this.isMassageService()) {
+      return this.selectedSlots.length === 0;
+    }
+    return true;
   }
 
   loadAvailability() {
@@ -220,7 +254,9 @@ export class ReserverComponent implements OnInit {
         !(s.date === slot.date && s.end === slot.end)
       );
     } else {
-      this.selectedSlots.push(slot);
+      if (this.canSelectMoreSlots()) {
+        this.selectedSlots.push(slot);
+      }
     }
 
     console.log('Selected slots:', this.selectedSlots);
@@ -245,7 +281,17 @@ export class ReserverComponent implements OnInit {
   confirmBooking() {
     if (this.selectedSlots.length > 0) {
       console.log('Booking confirmed for slots:', this.selectedSlots);
-      this.bookingService.setSelectedSlots(this.selectedSlots, this.selectedService || 'Physiotherapy Session');
+
+      const duration: ServiceDuration = {
+        duration: this.isMassageService() ? this.selectedDuration : (this.serviceInfo?.duration || 30),
+        price: this.getSelectedPrice()
+      };
+
+      this.bookingService.setSelectedSlots(
+        this.selectedSlots,
+        this.selectedService || 'Physiotherapy Session',
+        duration
+      );
       this.router.navigate(['/confirmer']);
     }
   }

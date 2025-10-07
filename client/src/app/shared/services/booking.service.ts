@@ -6,16 +6,23 @@ export interface TimeSlot {
   summary: string;
 }
 
+export interface ServiceDuration {
+  duration: number;
+  price: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class BookingService {
   private selectedSlots: TimeSlot[] = [];
   private selectedService: string = '';
+  private selectedDuration: ServiceDuration | null = null;
 
-  setSelectedSlots(slots: TimeSlot[], service: string) {
+  setSelectedSlots(slots: TimeSlot[], service: string, duration?: ServiceDuration) {
     this.selectedSlots = slots;
     this.selectedService = service;
+    this.selectedDuration = duration || null;
   }
 
   getSelectedSlots(): TimeSlot[] {
@@ -26,6 +33,10 @@ export class BookingService {
     return this.selectedService;
   }
 
+  getSelectedDuration(): ServiceDuration | null {
+    return this.selectedDuration;
+  }
+
   hasSelectedSlots(): boolean {
     return this.selectedSlots.length > 0;
   }
@@ -33,5 +44,6 @@ export class BookingService {
   clearSelection() {
     this.selectedSlots = [];
     this.selectedService = '';
+    this.selectedDuration = null;
   }
 }

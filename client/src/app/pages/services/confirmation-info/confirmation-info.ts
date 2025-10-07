@@ -42,6 +42,11 @@ export class ConfirmationInfo implements OnInit {
       this.clientInfo.service = this.bookingService.getSelectedService();
       this.clientInfo.timeSlot = this.selectedSlots[0]?.date || '';
       this.clientInfo.timeSlotEnd = this.selectedSlots[0]?.end || '';
+
+      const duration = this.bookingService.getSelectedDuration();
+      if (duration) {
+        this.clientInfo.amount = duration.price;
+      }
     } else {
       this.router.navigate(['/reserver']);
     }

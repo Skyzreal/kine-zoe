@@ -6,6 +6,26 @@
     <div class="service-icon">{{ serviceInfo.icon }}</div>
     <h1>{{ serviceInfo.title }}</h1>
     <p class="service-description">{{ serviceInfo.description }}</p>
+
+    <div *ngIf="isMassageService()" class="duration-selector">
+      <h3>Choisissez la durée de votre massage</h3>
+      <div class="duration-options">
+        <label *ngFor="let option of massageDurations" class="duration-option">
+          <input
+            type="radio"
+            name="duration"
+            [value]="option.duration"
+            [(ngModel)]="selectedDuration"
+          />
+          <span class="duration-label">{{ option.label }}</span>
+        </label>
+      </div>
+    </div>
+
+    <div *ngIf="!isMassageService() && serviceInfo.price" class="service-pricing">
+      <p class="price-info">30 minutes - {{ serviceInfo.price / 100 }}$</p>
+      <p class="booking-note">Vous ne pouvez sélectionner qu'un seul créneau de 30 minutes</p>
+    </div>
   </div>
 
   <div *ngIf="!serviceInfo" class="default-header">

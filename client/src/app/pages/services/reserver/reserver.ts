@@ -255,11 +255,35 @@ export class ReserverComponent implements OnInit {
       );
     } else {
       if (this.canSelectMoreSlots()) {
-        this.selectedSlots.push(slot);
+        if (this.hasEnoughDuration(slot)) {
+          this.selectedSlots.push(slot);
+        }
       }
     }
 
     console.log('Selected slots:', this.selectedSlots);
+  }
+
+  hasEnoughDuration(slot: TimeSlot): boolean {
+    const slotStart = new Date(slot.date);
+    const slotEnd = new Date(slot.end);
+    const slotDurationMinutes = (slotEnd.getTime() - slotStart.getTime()) / (1000 * 60);
+
+    const requiredDuration = this.isMassageService()
+      ? this.selectedDuration + 15
+      : (this.serviceInfo?.duration || 30) + 15;
+
+    return slotDurationMinutes >= requiredDuration;
+  }
+
+  getSlotDuration(slot: TimeSlot): number {
+    const slotStart = new Date(slot.date);
+    const slotEnd = new Date(slot.end);
+    return (slotEnd.getTime() - slotStart.getTime()) / (1000 * 60);
+  }
+
+  isSlotTooShort(slot: TimeSlot): boolean {
+    return !this.hasEnoughDuration(slot);
   }
 
   isSlotSelected(slot: TimeSlot): boolean {

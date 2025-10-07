@@ -4,16 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c689c3cb-66fc-453c-a6d1-e3025d51aeef" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/.angular/cache/20.0.4/kine-zoe/.tsbuildinfo" beforeDir="false" afterPath="$PROJECT_DIR$/client/.angular/cache/20.0.4/kine-zoe/.tsbuildinfo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/app/pages/services/confirmation-info/confirmation-info.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/pages/services/confirmation-info/confirmation-info.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/app/pages/services/reserver/reserver.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/pages/services/reserver/reserver.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/app/pages/services/reserver/reserver.html" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/pages/services/reserver/reserver.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/app/pages/services/reserver/reserver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/pages/services/reserver/reserver.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/app/shared/services/booking.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/shared/services/booking.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/index.js" afterDir="false" />
-    </list>
+    <list default="true" id="c689c3cb-66fc-453c-a6d1-e3025d51aeef" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -113,7 +104,7 @@
       <workItem from="1759254232234" duration="1750000" />
       <workItem from="1759337179855" duration="2032000" />
       <workItem from="1759408788412" duration="6333000" />
-      <workItem from="1759858817963" duration="791000" />
+      <workItem from="1759858817963" duration="1079000" />
     </task>
     <servers />
   </component>

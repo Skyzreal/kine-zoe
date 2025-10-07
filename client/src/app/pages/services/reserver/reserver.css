@@ -415,7 +415,7 @@
   transition: all 0.3s ease;
 }
 
-.time-btn:hover {
+.time-btn:hover:not(.disabled) {
   background: #e3f2fd;
   border-color: #2196f3;
 }
@@ -426,10 +426,34 @@
   font-weight: bold;
 }
 
+.time-btn.disabled {
+  background: #f5f5f5;
+  border-color: #ddd;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.time-slot-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  align-items: flex-start;
+}
+
 .time-btn .time-range {
   font-size: 14px;
   font-weight: 600;
   color: #333;
+}
+
+.time-btn .slot-duration {
+  font-size: 11px;
+  color: #059669;
+  font-weight: 500;
+}
+
+.time-btn.disabled .slot-duration {
+  color: #999;
 }
 
 .time-btn .slot-title {

@@ -98,10 +98,16 @@
               *ngFor="let slot of selectedDay.slots"
               class="time-btn"
               [class.selected]="isSlotSelected(slot)"
+              [class.disabled]="isSlotTooShort(slot)"
+              [disabled]="isSlotTooShort(slot)"
               (click)="selectTimeSlot(slot)"
+              [title]="isSlotTooShort(slot) ? 'Créneau trop court pour la durée sélectionnée (besoin de ' + (isMassageService() ? selectedDuration + 15 : (serviceInfo?.duration || 30) + 15) + ' minutes)' : ''"
             >
-              <span class="time-range">{{ getTimeRange(slot) }}</span>
-              <span class="slot-title">{{ slot.summary }}</span>
+              <div class="time-slot-content">
+                <span class="time-range">{{ getTimeRange(slot) }}</span>
+                <span class="slot-duration" *ngIf="getSlotDuration(slot) >= 60">({{ getSlotDuration(slot) }}min disponibles)</span>
+                <span class="slot-title">{{ slot.summary }}</span>
+              </div>
               <span class="selection-indicator" *ngIf="isSlotSelected(slot)">✓</span>
             </button>
           </div>

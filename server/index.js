@@ -96,7 +96,7 @@ async function updateCalendarSlot(clientInfo) {
     const startTime = new Date(clientInfo.timeSlot);
     console.log('Parsed start time:', startTime.toISOString());
     console.log('Raw timeSlotEnd value:', clientInfo.timeSlotEnd);
-    
+
     let endTime;
     if (clientInfo.timeSlotEnd && clientInfo.timeSlotEnd !== clientInfo.timeSlot) {
       endTime = new Date(clientInfo.timeSlotEnd);
@@ -109,7 +109,7 @@ async function updateCalendarSlot(clientInfo) {
     const searchStartTime = new Date(startTime.getTime() - 60000);
     const searchEndTime = new Date(endTime.getTime() + 60000);
     console.log('Searching for existing events between:', searchStartTime.toISOString(), 'and', searchEndTime.toISOString());
-    
+
     const existingEvents = await calendar.events.list({
       auth: authClient,
       calendarId,
@@ -121,23 +121,70 @@ async function updateCalendarSlot(clientInfo) {
     const freeEvent = existingEvents.data.items?.find(event =>
       (event.summary || '').toLowerCase().includes('free')
     );
-    
+
     const existingClientEvent = existingEvents.data.items?.find(event =>
       (event.summary || '').includes(clientInfo.name)
     );
-    
+
     if (existingClientEvent) {
       console.log('Appointment already exists for this client at this time:', existingClientEvent.summary);
       return existingClientEvent;
     }
 
     if (freeEvent) {
+      const freeEventStart = new Date(freeEvent.start.dateTime || freeEvent.start.date);
+      const freeEventEnd = new Date(freeEvent.end.dateTime || freeEvent.end.date);
+
       await calendar.events.delete({
         auth: authClient,
         calendarId,
         eventId: freeEvent.id,
       });
       console.log('Deleted FREE event:', freeEvent.summary);
+
+      const bufferEndTime = new Date(endTime.getTime() + 15*60*1000);
+
+      if (freeEventStart < startTime) {
+        const beforeFreeEvent = {
+          summary: 'FREE',
+          start: {
+            dateTime: freeEventStart.toISOString(),
+            timeZone: 'America/Toronto',
+          },
+          end: {
+            dateTime: startTime.toISOString(),
+            timeZone: 'America/Toronto',
+          },
+          transparency: 'transparent'
+        };
+        await calendar.events.insert({
+          auth: authClient,
+          calendarId,
+          resource: beforeFreeEvent,
+        });
+        console.log('Created FREE slot before appointment:', freeEventStart.toISOString(), 'to', startTime.toISOString());
+      }
+
+      if (bufferEndTime < freeEventEnd) {
+        const afterFreeEvent = {
+          summary: 'FREE',
+          start: {
+            dateTime: bufferEndTime.toISOString(),
+            timeZone: 'America/Toronto',
+          },
+          end: {
+            dateTime: freeEventEnd.toISOString(),
+            timeZone: 'America/Toronto',
+          },
+          transparency: 'transparent'
+        };
+        await calendar.events.insert({
+          auth: authClient,
+          calendarId,
+          resource: afterFreeEvent,
+        });
+        console.log('Created FREE slot after appointment+buffer:', bufferEndTime.toISOString(), 'to', freeEventEnd.toISOString());
+      }
     }
 
     const calendarEvent = {

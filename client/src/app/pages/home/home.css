@@ -51,8 +51,8 @@ body {
 }
 
 .hero-photo img {
-  width: 280px;
-  height: 280px;
+  width: 500px;
+  height: 550px;
   object-fit: cover;
   border-radius: 50%;
   border: 8px solid #d5eafd;
@@ -74,8 +74,8 @@ body {
 }
 
 .shape1 {
-  width: 500px;
-  height: 500px;
+  width: 700px;
+  height: 700px;
   background: #fef6d1;
   top: -100px;
   left: -150px;
@@ -128,8 +128,8 @@ body {
   }
 
   .hero-photo img {
-    width: 400px;
-    height: 400px;
+    width: 550px;
+    height: 550px;
     margin: 5rem;
   }
 }

@@ -8,6 +8,8 @@ export interface ClientInfo {
   nom: string;
   phone: string;
   email: string;
+  adresse: string;
+  dateNaissance: string;
   service?: string;
   timeSlot?: string;
   timeSlotEnd?: string;

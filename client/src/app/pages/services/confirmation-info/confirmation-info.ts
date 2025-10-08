@@ -30,6 +30,8 @@ export class ConfirmationInfo implements OnInit {
     nom: '',
     phone: '',
     email: '',
+    adresse: '',
+    dateNaissance: '',
     service: 'Physiotherapy Session',
     timeSlot: '',
     timeSlotEnd: '',

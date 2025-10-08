@@ -69,6 +69,8 @@ app.post('/api/create-payment-session', async (req, res) => {
         client_name: `${clientInfo.prenom} ${clientInfo.nom}`,
         client_phone: clientInfo.phone,
         client_email: clientInfo.email,
+        client_adresse: clientInfo.adresse,
+        client_date_naissance: clientInfo.dateNaissance,
         service: service,
         time_slot: timeSlot,
         time_slot_end: timeSlotEnd
@@ -106,9 +108,13 @@ async function updateCalendarSlot(clientInfo) {
       console.log('Using default 1-hour duration, end time:', endTime.toISOString());
     }
 
-    const searchStartTime = new Date(startTime.getTime() - 60000);
-    const searchEndTime = new Date(endTime.getTime() + 60000);
-    console.log('Searching for existing events between:', searchStartTime.toISOString(), 'and', searchEndTime.toISOString());
+    // Search for events that overlap with the appointment time
+    // We need a wider search to catch FREE events that may have started earlier
+    const searchStartTime = new Date(startTime);
+    searchStartTime.setHours(0, 0, 0, 0); // Start of the day
+    const searchEndTime = new Date(startTime);
+    searchEndTime.setHours(23, 59, 59, 999); // End of the day
+    console.log('Searching for existing events on:', searchStartTime.toISOString(), 'to', searchEndTime.toISOString());
 
     const existingEvents = await calendar.events.list({
       auth: authClient,
@@ -118,9 +124,16 @@ async function updateCalendarSlot(clientInfo) {
       singleEvents: true,
     });
 
-    const freeEvent = existingEvents.data.items?.find(event =>
-      (event.summary || '').toLowerCase().includes('free')
-    );
+    // Find the FREE event that contains the appointment start time
+    const freeEvent = existingEvents.data.items?.find(event => {
+      if (!(event.summary || '').toLowerCase().includes('free')) {
+        return false;
+      }
+      const eventStart = new Date(event.start.dateTime || event.start.date);
+      const eventEnd = new Date(event.end.dateTime || event.end.date);
+      // Check if the appointment falls within this FREE event
+      return eventStart <= startTime && eventEnd >= endTime;
+    });
 
     const existingClientEvent = existingEvents.data.items?.find(event =>
       (event.summary || '').includes(clientInfo.name)
@@ -189,7 +202,7 @@ async function updateCalendarSlot(clientInfo) {
 
     const calendarEvent = {
       summary: `${clientInfo.service} - ${clientInfo.name}`,
-      description: `Client: ${clientInfo.name}\nEmail: ${clientInfo.email}\nPhone: ${clientInfo.phone}\nService: ${clientInfo.service}`,
+      description: `Client: ${clientInfo.name}\nEmail: ${clientInfo.email}\nPhone: ${clientInfo.phone}\nAdresse: ${clientInfo.adresse || 'N/A'}\nDate de naissance: ${clientInfo.dateNaissance || 'N/A'}\nService: ${clientInfo.service}`,
       start: {
         dateTime: startTime.toISOString(),
         timeZone: 'America/Toronto',
@@ -364,6 +377,8 @@ app.get('/api/verify-payment/:sessionId', async (req, res) => {
         name: session.metadata.client_name,
         email: session.metadata.client_email,
         phone: session.metadata.client_phone,
+        adresse: session.metadata.client_adresse,
+        dateNaissance: session.metadata.client_date_naissance,
         service: session.metadata.service,
         timeSlot: session.metadata.time_slot,
         timeSlotEnd: session.metadata.time_slot_end
@@ -399,6 +414,79 @@ app.get('/api/verify-payment/:sessionId', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+/**
+ * Smart time slot splitting algorithm
+ * Breaks large FREE blocks into bookable slots while preventing awkward gaps
+ *
+ * @param {Array} freeSlots - Array of FREE calendar events
+ * @returns {Array} - Array of optimally split time slots
+ */
+function splitFreeSlots(freeSlots) {
+  const INTERVAL_MINUTES = 15; // Split into 15-minute intervals
+  const MIN_SLOT_DURATION = 45; // Minimum bookable slot (45 minutes)
+
+  const result = [];
+
+  freeSlots.forEach(slot => {
+    const start = new Date(slot.date);
+    const end = new Date(slot.end);
+    const totalMinutes = (end - start) / (1000 * 60);
+
+    // If the slot is too small to book, skip it
+    if (totalMinutes < MIN_SLOT_DURATION) {
+      return;
+    }
+
+    // Round start time to next 15-minute interval if not already aligned
+    const startMinutes = start.getMinutes();
+    const startRemainder = startMinutes % INTERVAL_MINUTES;
+    if (startRemainder !== 0) {
+      start.setMinutes(startMinutes + (INTERVAL_MINUTES - startRemainder));
+      start.setSeconds(0);
+      start.setMilliseconds(0);
+    }
+
+    // Round end time to previous 15-minute interval if not already aligned
+    const endMinutes = end.getMinutes();
+    const endRemainder = endMinutes % INTERVAL_MINUTES;
+    if (endRemainder !== 0) {
+      end.setMinutes(endMinutes - endRemainder);
+      end.setSeconds(0);
+      end.setMilliseconds(0);
+    }
+
+    // Recalculate duration after rounding
+    const adjustedMinutes = (end - start) / (1000 * 60);
+
+    if (adjustedMinutes < MIN_SLOT_DURATION) {
+      return; // Skip if rounding made it too small
+    }
+
+    // Generate slots at 15-minute intervals
+    let currentTime = new Date(start);
+
+    while (currentTime < end) {
+      // Only add if there's at least MIN_SLOT_DURATION available from this point
+      const remainingMinutes = (end - currentTime) / (1000 * 60);
+      if (remainingMinutes >= MIN_SLOT_DURATION) {
+        // Keep the full remaining time in 'end' for frontend validation
+        result.push({
+          date: currentTime.toISOString(),
+          end: end.toISOString(),
+          summary: `FREE`
+        });
+      }
+
+      // Move to next 15-minute interval
+      const nextTime = new Date(currentTime);
+      nextTime.setMinutes(nextTime.getMinutes() + INTERVAL_MINUTES);
+      currentTime = nextTime;
+    }
+  });
+
+  return result;
+}
 
 app.get('/availability', async (req, res) => {
   const calendarId = process.env.CALENDAR_ID;
@@ -448,16 +536,20 @@ app.get('/availability', async (req, res) => {
         summary: e.summary
       }));
 
-    console.log('Free slots found:', freeSlots.length);
+    console.log('Free slots found (before splitting):', freeSlots.length);
 
-    if (freeSlots.length > 0) {
-      console.log('Sample slots:');
-      freeSlots.slice(0, 5).forEach((slot, index) => {
+    // Apply smart slot splitting
+    const splitSlots = splitFreeSlots(freeSlots);
+    console.log('Free slots after splitting:', splitSlots.length);
+
+    if (splitSlots.length > 0) {
+      console.log('Sample split slots:');
+      splitSlots.slice(0, 5).forEach((slot, index) => {
         console.log(`${index + 1}. ${slot.date} - ${slot.end} (${slot.summary})`);
       });
     }
 
-    res.json(freeSlots);
+    res.json(splitSlots);
   } catch (error) {
     console.error('=== DETAILED ERROR INFO ===');
     console.error('Error message:', error.message);
@@ -520,7 +612,11 @@ app.get('/availability/:months', async (req, res) => {
         summary: e.summary
       }));
 
-    res.json(freeSlots);
+    // Apply smart slot splitting
+    const splitSlots = splitFreeSlots(freeSlots);
+    console.log('Free slots after splitting:', splitSlots.length);
+
+    res.json(splitSlots);
   } catch (error) {
     console.error('Error fetching extended availability:', error);
     res.status(500).json({

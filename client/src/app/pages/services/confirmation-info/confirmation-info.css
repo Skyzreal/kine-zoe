@@ -28,11 +28,34 @@
   gap: 1rem;
 }
 
+.info-form label {
+  text-align: left;
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
 .info-form input {
   padding: 0.75rem;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.info-form input:focus {
+  outline: none;
+  border-color: #4a90e2;
+}
+
+.info-form input.invalid {
+  border-color: #dc3545;
+}
+
+.error-text {
+  color: #dc3545;
+  font-size: 0.875rem;
+  text-align: left;
+  margin-top: -0.5rem;
 }
 
 .info-form button {

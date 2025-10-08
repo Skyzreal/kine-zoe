@@ -8,38 +8,97 @@
   <form class="info-form" (ngSubmit)="submitForm()" #userForm="ngForm">
     <p class="form-note">Tous les champs sont obligatoires</p>
 
-    <label>Prénom</label>
+    <label>Prénom *</label>
     <input
       name="prenom"
       [(ngModel)]="clientInfo.prenom"
       required
+      minlength="2"
+      #prenom="ngModel"
       placeholder="Votre prénom"
+      [class.invalid]="prenom.invalid && (prenom.dirty || prenom.touched)"
     />
+    <div class="error-text" *ngIf="prenom.invalid && (prenom.dirty || prenom.touched)">
+      <span *ngIf="prenom.errors?.['required']">Le prénom est obligatoire</span>
+      <span *ngIf="prenom.errors?.['minlength']">Le prénom doit contenir au moins 2 caractères</span>
+    </div>
 
-    <label>Nom</label>
+    <label>Nom *</label>
     <input
       name="nom"
       [(ngModel)]="clientInfo.nom"
       required
+      minlength="2"
+      #nom="ngModel"
       placeholder="Votre nom"
+      [class.invalid]="nom.invalid && (nom.dirty || nom.touched)"
     />
+    <div class="error-text" *ngIf="nom.invalid && (nom.dirty || nom.touched)">
+      <span *ngIf="nom.errors?.['required']">Le nom est obligatoire</span>
+      <span *ngIf="nom.errors?.['minlength']">Le nom doit contenir au moins 2 caractères</span>
+    </div>
 
-    <label>Numéro de téléphone</label>
+    <label>Adresse *</label>
+    <input
+      name="adresse"
+      [(ngModel)]="clientInfo.adresse"
+      required
+      minlength="5"
+      #adresse="ngModel"
+      placeholder="123 Rue Exemple, Montréal, QC"
+      [class.invalid]="adresse.invalid && (adresse.dirty || adresse.touched)"
+    />
+    <div class="error-text" *ngIf="adresse.invalid && (adresse.dirty || adresse.touched)">
+      <span *ngIf="adresse.errors?.['required']">L'adresse est obligatoire</span>
+      <span *ngIf="adresse.errors?.['minlength']">L'adresse doit contenir au moins 5 caractères</span>
+    </div>
+
+    <label>Date de naissance *</label>
+    <input
+      name="dateNaissance"
+      type="date"
+      [(ngModel)]="clientInfo.dateNaissance"
+      required
+      #dateNaissance="ngModel"
+      [class.invalid]="dateNaissance.invalid && (dateNaissance.dirty || dateNaissance.touched)"
+    />
+    <div class="error-text" *ngIf="dateNaissance.invalid && (dateNaissance.dirty || dateNaissance.touched)">
+      <span *ngIf="dateNaissance.errors?.['required']">La date de naissance est obligatoire</span>
+    </div>
+
+    <label>Numéro de téléphone *</label>
     <input
       name="phone"
+      type="tel"
       [(ngModel)]="clientInfo.phone"
       required
+      pattern="[\(\)\d\s\-\+]+"
+      minlength="10"
+      #phone="ngModel"
       placeholder="(514) 123-4567"
+      [class.invalid]="phone.invalid && (phone.dirty || phone.touched)"
     />
+    <div class="error-text" *ngIf="phone.invalid && (phone.dirty || phone.touched)">
+      <span *ngIf="phone.errors?.['required']">Le numéro de téléphone est obligatoire</span>
+      <span *ngIf="phone.errors?.['pattern']">Format de téléphone invalide</span>
+      <span *ngIf="phone.errors?.['minlength']">Le numéro doit contenir au moins 10 chiffres</span>
+    </div>
 
-    <label>E-mail</label>
+    <label>E-mail *</label>
     <input
       name="email"
-      [(ngModel)]="clientInfo.email"
       type="email"
+      [(ngModel)]="clientInfo.email"
       required
+      email
+      #emailField="ngModel"
       placeholder="votre@email.com"
+      [class.invalid]="emailField.invalid && (emailField.dirty || emailField.touched)"
     />
+    <div class="error-text" *ngIf="emailField.invalid && (emailField.dirty || emailField.touched)">
+      <span *ngIf="emailField.errors?.['required']">L'e-mail est obligatoire</span>
+      <span *ngIf="emailField.errors?.['email']">L'e-mail doit être valide</span>
+    </div>
 
     <!-- Display selected service and time slot -->
     <div class="booking-summary">

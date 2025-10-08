@@ -251,12 +251,28 @@ export class ReserverComponent implements OnInit {
 
     if (isAlreadySelected) {
       this.selectedSlots = this.selectedSlots.filter(s =>
-        !(s.date === slot.date && s.end === slot.end)
+        !(s.date === slot.date)
       );
     } else {
       if (this.canSelectMoreSlots()) {
         if (this.hasEnoughDuration(slot)) {
-          this.selectedSlots.push(slot);
+          // Calculate the correct end time based on selected duration
+          const appointmentDuration = this.isMassageService()
+            ? this.selectedDuration
+            : (this.serviceInfo?.duration || 30);
+
+          const startTime = new Date(slot.date);
+          const endTime = new Date(startTime);
+          endTime.setMinutes(endTime.getMinutes() + appointmentDuration);
+
+          // Create a new slot with the correct end time
+          const bookingSlot: TimeSlot = {
+            date: slot.date,
+            end: endTime.toISOString(),
+            summary: slot.summary
+          };
+
+          this.selectedSlots.push(bookingSlot);
         }
       }
     }
@@ -288,7 +304,7 @@ export class ReserverComponent implements OnInit {
 
   isSlotSelected(slot: TimeSlot): boolean {
     return this.selectedSlots.some(s =>
-      s.date === slot.date && s.end === slot.end
+      s.date === slot.date
     );
   }
 
@@ -355,14 +371,21 @@ export class ReserverComponent implements OnInit {
 
   getTimeRange(slot: TimeSlot): string {
     const start = new Date(slot.date);
-    const end = new Date(slot.end);
+
+    // Calculate the actual appointment end time based on selected duration
+    const appointmentDuration = this.isMassageService()
+      ? this.selectedDuration
+      : (this.serviceInfo?.duration || 30);
+
+    const appointmentEnd = new Date(start);
+    appointmentEnd.setMinutes(appointmentEnd.getMinutes() + appointmentDuration);
 
     const startTime = start.toLocaleTimeString('fr-FR', {
       hour: '2-digit',
       minute: '2-digit'
     });
 
-    const endTime = end.toLocaleTimeString('fr-FR', {
+    const endTime = appointmentEnd.toLocaleTimeString('fr-FR', {
       hour: '2-digit',
       minute: '2-digit'
     });

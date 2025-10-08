@@ -105,8 +105,6 @@
             >
               <div class="time-slot-content">
                 <span class="time-range">{{ getTimeRange(slot) }}</span>
-                <span class="slot-duration" *ngIf="getSlotDuration(slot) >= 60">({{ getSlotDuration(slot) }}min disponibles)</span>
-                <span class="slot-title">{{ slot.summary }}</span>
               </div>
               <span class="selection-indicator" *ngIf="isSlotSelected(slot)">✓</span>
             </button>
@@ -126,7 +124,6 @@
           <div class="slot-info">
             <span class="slot-date">{{ getFullDate(slot.date) }}</span>
             <span class="slot-time">{{ getTimeRange(slot) }}</span>
-            <span class="slot-service">{{ slot.summary }}</span>
           </div>
           <button (click)="removeSelectedSlot(slot)" class="remove-slot-btn" title="Supprimer ce créneau">×</button>
         </div>

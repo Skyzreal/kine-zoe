@@ -102,7 +102,7 @@ body {
     overflow:hidden;
   }
   .home-container {
-    padding-top: 0rem;
+    padding-top: 0;
     padding-left: 3rem;
     text-align: left;
   }

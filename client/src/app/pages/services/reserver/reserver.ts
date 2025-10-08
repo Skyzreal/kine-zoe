@@ -124,9 +124,6 @@ export class ReserverComponent implements OnInit {
   }
 
   canSelectMoreSlots(): boolean {
-    if (!this.isMassageService()) {
-      return this.selectedSlots.length === 0;
-    }
     return true;
   }
 

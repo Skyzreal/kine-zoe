@@ -15,21 +15,21 @@ html, body {
   position: relative;
   height: 50vh;
   min-height: 300px;
-  background: linear-gradient(135deg, rgba(76, 82, 121, 0.8), rgba(102, 126, 234, 0.6)),
+  background: linear-gradient(135deg, rgba(139, 134, 114, 0.85), rgba(181, 168, 154, 0.7)),
   url('../../../assets/images/zo-selfie.jpg') center/cover;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  color: white;
+  color: var(--color-white, white);
 }
 
 .hero-content h1 {
   font-size: 3rem;
   font-weight: 300;
   margin-bottom: 1rem;
-  font-family: 'Georgia', serif;
+  font-family: var(--font-primary, 'Cormorant', serif);
 }
 
 .hero-content h2 {
@@ -43,7 +43,7 @@ html, body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 4rem 2rem;
-  background: white;
+  background: var(--color-white, white);
 }
 
 .about-me-section {
@@ -54,8 +54,8 @@ html, body {
   font-size: 2.5rem;
   margin-bottom: 3rem;
   text-align: center;
-  color: #333;
-  font-family: 'Georgia', serif;
+  color: var(--color-text-dark, #3A3A3A);
+  font-family: var(--font-primary, 'Cormorant', serif);
 }
 
 .presentation-content {
@@ -143,20 +143,20 @@ html, body {
 .section-title {
   font-size: 1.8rem;
   margin-bottom: 1.5rem;
-  color: #333;
-  font-family: 'Georgia', serif;
+  color: var(--color-text-dark, #3A3A3A);
+  font-family: var(--font-primary, 'Cormorant', serif);
 }
 
 .section-text {
   font-size: 1rem;
   line-height: 1.7;
-  color: #555;
+  color: var(--color-text-medium, #6B6652);
   margin-bottom: 1.5rem;
   text-align: justify;
 }
 
 .services-info {
-  background: #f8f9fa;
+  background: var(--color-secondary, #F5EFE7);
   padding: 4rem 2rem;
 }
 
@@ -169,23 +169,23 @@ html, body {
 }
 
 .service-card {
-  background: white;
+  background: var(--color-white, white);
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(139, 134, 114, 0.1);
 }
 
 .service-card h3 {
   font-size: 1.5rem;
-  color: #333;
+  color: var(--color-text-dark, #3A3A3A);
   margin-bottom: 1rem;
-  font-family: 'Georgia', serif;
+  font-family: var(--font-primary, 'Cormorant', serif);
 }
 
 .service-card p {
   font-size: 0.95rem;
   line-height: 1.6;
-  color: #555;
+  color: var(--color-text-medium, #6B6652);
   margin-bottom: 1.5rem;
 }
 
@@ -195,7 +195,7 @@ html, body {
 
 .service-types h4 {
   font-size: 1.1rem;
-  color: #333;
+  color: var(--color-text-dark, #3A3A3A);
   margin-bottom: 0.5rem;
 }
 
@@ -203,7 +203,7 @@ html, body {
   list-style-type: disc;
   padding-left: 1.5rem;
   font-size: 0.9rem;
-  color: #555;
+  color: var(--color-text-medium, #6B6652);
 }
 
 .service-types li {
@@ -211,7 +211,7 @@ html, body {
 }
 
 .studies-section {
-  background: white;
+  background: var(--color-white, white);
   padding: 4rem 2rem;
 }
 
@@ -224,8 +224,8 @@ html, body {
 .studies-section h2 {
   font-size: 2rem;
   margin-bottom: 2rem;
-  color: #333;
-  font-family: 'Georgia', serif;
+  color: var(--color-text-dark, #3A3A3A);
+  font-family: var(--font-primary, 'Cormorant', serif);
 }
 
 .studies-list {
@@ -234,28 +234,29 @@ html, body {
 }
 
 .studies-list li {
-  background: #f8f9fa;
+  background: var(--color-secondary, #F5EFE7);
   padding: 1rem;
   margin-bottom: 0.5rem;
   border-radius: 8px;
   font-size: 0.95rem;
-  color: #555;
+  color: var(--color-text-medium, #6B6652);
 }
 
 .button {
-  background-color: #007bff;
-  color: white;
+  background-color: var(--color-primary, #8B8672);
+  color: var(--color-white, white);
   padding: 1rem 2rem;
   border-radius: 30px;
   font-weight: bold;
   text-decoration: none;
   display: inline-block;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
   margin-top: 1rem;
 }
 
 .button:hover {
-  background-color: #0056b3;
+  background-color: var(--color-primary-dark, #6B6652);
+  transform: scale(1.05);
 }
 
 @media (max-width: 1024px) {

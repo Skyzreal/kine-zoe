@@ -5,9 +5,9 @@ body {
 
 .home-container {
   padding: 6rem 1.5rem 2rem 1.5rem;
-  font-family: 'Georgia', serif;
+  font-family: var(--font-primary, 'Cormorant', serif);
   min-height: 100%;
-  background: #eee;
+  background: var(--color-background, #F5EFE7);
   position: relative;
   overflow: hidden;
   text-align: center;
@@ -35,19 +35,25 @@ body {
   font-size: 1.4rem;
   margin-top: 1.2rem;
   font-weight: 400;
-  color: #444;
+  color: var(--color-text-medium, #6B6652);
 }
 
 .button {
   display: inline-block;
   margin-top: 2rem;
-  background-color: #f4ec9d;
+  background-color: var(--color-primary, #8B8672);
   padding: 1rem 2rem;
   font-size: 1.6rem;
   border-radius: 30px;
   text-decoration: none;
   font-weight: bold;
-  color: black;
+  color: var(--color-white, white);
+  transition: all 0.3s ease;
+}
+
+.button:hover {
+  background-color: var(--color-primary-dark, #6B6652);
+  transform: scale(1.05);
 }
 
 .hero-photo img {
@@ -55,7 +61,7 @@ body {
   height: 550px;
   object-fit: cover;
   border-radius: 50%;
-  border: 8px solid #d5eafd;
+  border: 8px solid var(--color-accent-light, #D4CEC4);
   margin-top: 2rem;
 }
 
@@ -76,7 +82,7 @@ body {
 .shape1 {
   width: 700px;
   height: 700px;
-  background: #fef6d1;
+  background: var(--color-shape-1, #E8E2D8);
   top: -100px;
   left: -150px;
 }
@@ -84,7 +90,7 @@ body {
 .shape2 {
   width: 400px;
   height: 400px;
-  background: #c7e6fb;
+  background: var(--color-shape-2, #D4CEC4);
   bottom: -80px;
   right: -120px;
 }
@@ -92,7 +98,7 @@ body {
 .shape3 {
   width: 350px;
   height: 350px;
-  background: #e0d4f5;
+  background: var(--color-shape-3, #C8BFB3);
   top: 200px;
   right: 200px;
 }

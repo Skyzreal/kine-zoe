@@ -1,8 +1,8 @@
 .services-container {
   position: relative;
   padding: 6rem 1.5rem 4rem;
-  font-family: 'Georgia', serif;
-  background: #fefefe;
+  font-family: var(--font-primary, 'Cormorant', serif);
+  background: var(--color-background, #F5EFE7);
   text-align: center;
 }
 
@@ -13,7 +13,7 @@
 }
 
 .services-header span {
-  color: #6cb5f3;
+  color: var(--color-primary, #8B8672);
   font-weight: bold;
 }
 
@@ -24,11 +24,11 @@
 }
 
 .service-card {
-  background: white;
+  background: var(--color-white, white);
   padding: 2rem;
   border-radius: 12px;
   text-align: center;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 3px 12px rgba(139, 134, 114, 0.1);
   position: relative;
 }
 
@@ -60,24 +60,24 @@
 .service-icon svg {
   width: 40px;
   height: 40px;
-  color: #333;
+  color: var(--color-primary, #8B8672);
   transition: all 0.3s ease;
 }
 
 .pastel-blue .service-icon svg {
-  color: #2563eb;
+  color: var(--color-primary, #8B8672);
 }
 
 .pastel-yellow .service-icon svg {
-  color: #f59e0b;
+  color: var(--color-primary-dark, #6B6652);
 }
 
 .pastel-orange .service-icon svg {
-  color: #ea580c;
+  color: var(--color-primary, #8B8672);
 }
 
 .pastel-mint .service-icon svg {
-  color: #059669;
+  color: var(--color-primary-dark, #6B6652);
 }
 
 .service-card:hover .service-icon svg {
@@ -92,32 +92,35 @@
 .service-card p {
   font-size: 0.95rem;
   margin-bottom: 1.5rem;
-  color: #444;
+  color: var(--color-text-medium, #6B6652);
 }
 
 .service-card .btn {
-  background-color: #f4ec9d;
+  background-color: var(--color-primary, #8B8672);
   padding: 0.6rem 1.2rem;
   border-radius: 30px;
   font-weight: bold;
   text-decoration: none;
-  border: 1px solid black;
-  color: black;
+  border: 1px solid var(--color-primary, #8B8672);
+  color: var(--color-white, white);
   display: inline-block;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .service-card .btn:hover {
-  background-color: #f0e693;
+  background-color: var(--color-primary-dark, #6B6652);
+  border-color: var(--color-primary-dark, #6B6652);
+  transform: scale(1.05);
 }
 
-.pastel-blue { background-color: #e0efff; }
-.pastel-yellow { background-color: #fffacc; }
-.pastel-pink { background-color: #ffe5eb; }
-.pastel-purple { background-color: #f0eaff; }
-.pastel-green { background-color: #e7ffe4; }
-.pastel-orange { background-color: #fff1cc; }
-.pastel-mint { background-color: #e1f5f0; }
+.pastel-blue { background-color: var(--color-shape-1, #E8E2D8); }
+.pastel-yellow { background-color: var(--color-shape-2, #D4CEC4); }
+.pastel-pink { background-color: var(--color-accent-light, #D4CEC4); }
+.pastel-purple { background-color: var(--color-shape-3, #C8BFB3); }
+.pastel-green { background-color: var(--color-shape-1, #E8E2D8); }
+.pastel-orange { background-color: var(--color-shape-2, #D4CEC4); }
+.pastel-mint { background-color: var(--color-shape-3, #C8BFB3); }
 
 .bg-shape {
   position: absolute;
@@ -129,7 +132,7 @@
 .shape1 {
   width: 400px;
   height: 400px;
-  background: #f4ec9d;
+  background: var(--color-shape-1, #E8E2D8);
   top: -120px;
   left: -100px;
 }
@@ -137,7 +140,7 @@
 .shape2 {
   width: 300px;
   height: 300px;
-  background: #d5eafd;
+  background: var(--color-shape-2, #D4CEC4);
   bottom: -100px;
   right: -80px;
 }

@@ -1,13 +1,13 @@
 .confirmation-container {
   padding: 120px 5% 4rem;
-  font-family: 'Georgia', serif;
+  font-family: var(--font-primary, 'Cormorant', serif);
   text-align: center;
-  background: #fefefe;
+  background: var(--color-background, #F5EFE7);
   position: relative;
 }
 
 .subtitle {
-  color: #555;
+  color: var(--color-text-medium, #6B6652);
   margin-bottom: 2rem;
 }
 
@@ -17,12 +17,12 @@
 }
 
 .info-form {
-  background: white;
+  background: var(--color-white, white);
   padding: 2rem;
   border-radius: 12px;
   max-width: 500px;
   margin: 0 auto;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 3px 12px rgba(139, 134, 114, 0.1);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -59,18 +59,26 @@
 }
 
 .info-form button {
-  background: #f4ec9d;
+  background: var(--color-primary, #8B8672);
   padding: 0.8rem;
-  border: 1px solid black;
+  border: 1px solid var(--color-primary, #8B8672);
   font-weight: bold;
   border-radius: 6px;
   cursor: pointer;
+  color: var(--color-white, white);
+  transition: all 0.3s ease;
+}
+
+.info-form button:hover {
+  background: var(--color-primary-dark, #6B6652);
+  border-color: var(--color-primary-dark, #6B6652);
+  transform: scale(1.05);
 }
 
 .thank-you {
   padding: 140px 5% 4rem;
   text-align: center;
-  font-family: 'Georgia', serif;
+  font-family: var(--font-primary, 'Cormorant', serif);
 }
 
 .bg-shape {
@@ -83,7 +91,7 @@
 .shape1 {
   width: 400px;
   height: 400px;
-  background: #d5eafd;
+  background: var(--color-shape-1, #E8E2D8);
   top: -100px;
   left: -100px;
 }
@@ -91,7 +99,7 @@
 .shape2 {
   width: 300px;
   height: 300px;
-  background: #ffd5e6;
+  background: var(--color-shape-2, #D4CEC4);
   bottom: -80px;
   right: -60px;
 }

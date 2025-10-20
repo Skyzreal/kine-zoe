@@ -1,0 +1,11 @@
+{
+  "name": "kine-zoe-scripts",
+  "version": "1.0.0",
+  "description": "Automation scripts for KineZoe project",
+  "scripts": {
+    "pr-description": "node generate-pr-description.js",
+    "pr-description:main": "node generate-pr-description.js main"
+  },
+  "author": "",
+  "license": "MIT"
+}

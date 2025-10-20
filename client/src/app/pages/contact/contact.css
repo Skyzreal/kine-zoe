@@ -1,8 +1,8 @@
 .contact-container {
   position: relative;
   padding: 6rem 1.5rem 4rem;
-  background: #fafafa;
-  font-family: 'Georgia', serif;
+  background: var(--color-background, #F5EFE7);
+  font-family: var(--font-primary, 'Cormorant', serif);
   text-align: center;
 }
 
@@ -13,17 +13,17 @@ h1 {
 
 .subtitle {
   margin-bottom: 3rem;
-  color: #555;
+  color: var(--color-text-medium, #6B6652);
 }
 
 .contact-grid {
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  background: white;
+  background: var(--color-white, white);
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 12px rgba(139, 134, 114, 0.1);
 }
 
 .contact-info h3,
@@ -51,12 +51,19 @@ h1 {
 }
 
 .contact-form button {
-  background-color: #f4ec9d;
+  background-color: var(--color-primary, #8B8672);
   padding: 0.75rem;
   font-weight: bold;
-  border: 1px solid black;
+  border: 1px solid var(--color-primary, #8B8672);
   border-radius: 6px;
   cursor: pointer;
+  color: var(--color-white, white);
+  transition: all 0.3s ease;
+}
+
+.contact-form button:hover {
+  background-color: var(--color-primary-dark, #6B6652);
+  border-color: var(--color-primary-dark, #6B6652);
 }
 
 .contact-form button:disabled {
@@ -92,7 +99,7 @@ h1 {
 .shape1 {
   width: 400px;
   height: 400px;
-  background: #c7e6fb;
+  background: var(--color-shape-1, #E8E2D8);
   top: -100px;
   left: -100px;
 }
@@ -100,7 +107,7 @@ h1 {
 .shape2 {
   width: 300px;
   height: 300px;
-  background: #fef6d1;
+  background: var(--color-shape-2, #D4CEC4);
   bottom: -60px;
   right: -60px;
 }

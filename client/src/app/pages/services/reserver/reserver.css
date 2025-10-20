@@ -5,8 +5,8 @@
   gap: 0.5rem;
 }.reserver-container {
    padding: 120px 5% 4rem;
-   font-family: 'Georgia', serif;
-   background: #fefefe;
+   font-family: var(--font-primary, 'Cormorant', serif);
+   background: var(--color-background, #F5EFE7);
    position: relative;
    min-height: 100vh;
  }
@@ -22,7 +22,7 @@
 .subtitle {
   text-align: center;
   margin-bottom: 3rem;
-  color: #555;
+  color: var(--color-text-medium, #6B6652);
   font-size: 1.1rem;
   z-index: 1;
   position: relative;
@@ -42,23 +42,23 @@
 }
 
 .service-header.pastel-blue {
-  background: linear-gradient(135deg, #e0efff 0%, #d1e8ff 100%);
-  border: 1px solid rgba(108, 181, 243, 0.2);
+  background: linear-gradient(135deg, var(--color-shape-1, #E8E2D8) 0%, var(--color-shape-2, #D4CEC4) 100%);
+  border: 1px solid rgba(139, 134, 114, 0.2);
 }
 
 .service-header.pastel-yellow {
-  background: linear-gradient(135deg, #fffacc 0%, #fff5b8 100%);
-  border: 1px solid rgba(255, 193, 7, 0.2);
+  background: linear-gradient(135deg, var(--color-shape-2, #D4CEC4) 0%, var(--color-shape-3, #C8BFB3) 100%);
+  border: 1px solid rgba(139, 134, 114, 0.2);
 }
 
 .service-header.pastel-orange {
-  background: linear-gradient(135deg, #fff1cc 0%, #ffecb8 100%);
-  border: 1px solid rgba(255, 152, 0, 0.2);
+  background: linear-gradient(135deg, var(--color-accent-light, #D4CEC4) 0%, var(--color-shape-1, #E8E2D8) 100%);
+  border: 1px solid rgba(139, 134, 114, 0.2);
 }
 
 .service-header.pastel-mint {
-  background: linear-gradient(135deg, #e1f5f0 0%, #d4f1e9 100%);
-  border: 1px solid rgba(76, 175, 80, 0.2);
+  background: linear-gradient(135deg, var(--color-shape-3, #C8BFB3) 0%, var(--color-shape-1, #E8E2D8) 100%);
+  border: 1px solid rgba(139, 134, 114, 0.2);
 }
 
 .service-icon {
@@ -198,17 +198,19 @@
 }
 
 .retry-btn {
-  background: #f4ec9d;
-  border: 1px solid black;
+  background: var(--color-primary, #8B8672);
+  border: 1px solid var(--color-primary, #8B8672);
   padding: 0.8rem 2rem;
   font-weight: bold;
   border-radius: 30px;
   cursor: pointer;
   transition: all 0.3s ease;
+  color: var(--color-white, white);
 }
 
 .retry-btn:hover {
-  background: #f0e693;
+  background: var(--color-primary-dark, #6B6652);
+  border-color: var(--color-primary-dark, #6B6652);
   transform: translateY(-1px);
 }
 
@@ -350,8 +352,8 @@
 }
 
 .calendar-day.selected {
-  background: #f4ec9d !important;
-  color: #333;
+  background: var(--color-accent, #B5A89A) !important;
+  color: var(--color-white, white);
   font-weight: bold;
 }
 
@@ -421,9 +423,10 @@
 }
 
 .time-btn.selected {
-  background: #f4ec9d;
-  border: 2px solid black;
+  background: var(--color-accent, #B5A89A);
+  border: 2px solid var(--color-primary, #8B8672);
   font-weight: bold;
+  color: var(--color-white, white);
 }
 
 .time-btn.disabled {
@@ -456,6 +459,12 @@
   color: #999;
 }
 
+.time-btn.selected .time-range,
+.time-btn.selected .slot-duration,
+.time-btn.selected .slot-title {
+  color: var(--color-white, white);
+}
+
 .time-btn .slot-title {
   font-size: 12px;
   color: #666;
@@ -468,12 +477,12 @@
 }
 
 .selected-slots-panel {
-  background: white;
+  background: var(--color-white, white);
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 12px rgba(139, 134, 114, 0.1);
   margin-bottom: 2rem;
-  border-left: 4px solid #f4ec9d;
+  border-left: 4px solid var(--color-primary, #8B8672);
 }
 
 .selected-slots-header {
@@ -620,20 +629,22 @@
 
 .confirm-btn {
   margin-top: 1.5rem;
-  background: #f4ec9d;
-  border: 2px solid black;
+  background: var(--color-primary, #8B8672);
+  border: 2px solid var(--color-primary, #8B8672);
   padding: 0.8rem 2rem;
   font-weight: bold;
   border-radius: 30px;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-family: 'Georgia', serif;
+  font-family: var(--font-primary, 'Cormorant', serif);
+  color: var(--color-white, white);
 }
 
 .confirm-btn:hover {
-  background: #f0e693;
+  background: var(--color-primary-dark, #6B6652);
+  border-color: var(--color-primary-dark, #6B6652);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(244, 236, 157, 0.5);
+  box-shadow: 0 4px 12px rgba(139, 134, 114, 0.3);
 }
 
 .bg-shape {
@@ -646,7 +657,7 @@
 .shape1 {
   width: 400px;
   height: 400px;
-  background: #fef6d1;
+  background: var(--color-shape-1, #E8E2D8);
   top: -80px;
   left: -120px;
 }
@@ -654,7 +665,7 @@
 .shape2 {
   width: 300px;
   height: 300px;
-  background: #d5eafd;
+  background: var(--color-shape-2, #D4CEC4);
   bottom: -80px;
   right: -60px;
 }

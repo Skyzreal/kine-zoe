@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(tree:*)"
+      "Bash(git -c http.sslVerify=false push origin main)",
+      "WebFetch(domain:kine-zoe-api.vercel.app)",
+      "Bash(git commit:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

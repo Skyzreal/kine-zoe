@@ -11,8 +11,22 @@ app.use(cors());
 app.use(express.json());
 
 const calendar = google.calendar('v3');
+
+// Load service account from environment variable or file
+let credentials;
+if (process.env.GOOGLE_SERVICE_ACCOUNT) {
+  try {
+    credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT);
+  } catch (error) {
+    console.error('Error parsing GOOGLE_SERVICE_ACCOUNT environment variable:', error);
+    credentials = require('./service-account.json');
+  }
+} else {
+  credentials = require('./service-account.json');
+}
+
 const auth = new google.auth.GoogleAuth({
-  keyFile: './service-account.json',
+  credentials,
   scopes: ['https://www.googleapis.com/auth/calendar'],
 });
 
@@ -501,24 +515,31 @@ app.get('/api/verify-payment/:sessionId', async (req, res) => {
       try {
         // Update calendar immediately after payment verification
         await updateCalendarSlot(clientInfo);
-        console.log('Calendar updated successfully for:', clientInfo.name);
+        console.log('✓ Calendar updated successfully for:', clientInfo.name);
 
         // Send confirmation emails
         try {
           // Send email to customer
+          console.log('Attempting to send customer confirmation email...');
           await sendConfirmationEmail(clientInfo, paymentAmount);
-          console.log('Customer confirmation email sent');
+          console.log('✓ Customer confirmation email sent successfully');
 
           // Send notification to owner
+          console.log('Attempting to send owner notification email...');
           await sendOwnerNotification(clientInfo, paymentAmount);
-          console.log('Owner notification email sent');
+          console.log('✓ Owner notification email sent successfully');
         } catch (emailError) {
-          console.error('Error sending emails:', emailError);
+          console.error('✗ Error sending emails:', emailError.message);
+          console.error('Email error details:', {
+            code: emailError.code,
+            command: emailError.command,
+            response: emailError.response
+          });
           // Don't throw - calendar update succeeded and payment is complete
         }
 
       } catch (bookingError) {
-        console.error('Error processing booking after payment:', bookingError);
+        console.error('✗ Error processing booking after payment:', bookingError);
         // Still return success since payment was completed
         // Calendar/email failures shouldn't affect the user experience
       }
@@ -751,6 +772,47 @@ app.get('/availability/:months', async (req, res) => {
   }
 });
 
+app.post('/api/test-email', async (req, res) => {
+  try {
+    console.log('Testing email configuration...');
+
+    // Test email credentials
+    await transporter.verify();
+    console.log('✓ Email transporter verified successfully');
+
+    // Send test email
+    const testMailOptions = {
+      from: process.env.EMAIL_USER,
+      to: 'skyzbelow@gmail.com',
+      subject: 'Test Email - Configuration Verification',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #28a745;">✓ Email Configuration Test</h2>
+          <p>This is a test email to verify that your email configuration is working correctly.</p>
+          <p><strong>Timestamp:</strong> ${new Date().toLocaleString('fr-CA')}</p>
+          <p style="color: #28a745;">If you received this email, your email configuration is working properly!</p>
+        </div>
+      `
+    };
+
+    const info = await transporter.sendMail(testMailOptions);
+    console.log('✓ Test email sent successfully:', info.messageId);
+
+    res.json({
+      success: true,
+      message: 'Email configuration is working! Test email sent successfully.',
+      messageId: info.messageId
+    });
+  } catch (error) {
+    console.error('✗ Email configuration test failed:', error);
+    res.status(500).json({
+      error: 'Email configuration test failed',
+      details: error.message,
+      code: error.code
+    });
+  }
+});
+
 app.post('/api/contact', async (req, res) => {
   try {
     const { name, email, message } = req.body;
@@ -789,11 +851,37 @@ app.post('/api/contact', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-  console.log(`Available endpoints:`);
-  console.log(`  GET /availability - Next month's availability`);
-  console.log(`  GET /availability/:months - Custom months ahead`);
-  console.log(`  POST /api/contact - Send contact form email`);
-});
+// For local development only
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, async () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+    console.log(`Available endpoints:`);
+    console.log(`  GET /availability - Next month's availability`);
+    console.log(`  GET /availability/:months - Custom months ahead`);
+    console.log(`  POST /api/contact - Send contact form email`);
+    console.log(`  POST /api/test-email - Test email configuration`);
+
+    // Verify email configuration at startup
+    console.log('\n=== Email Configuration ===');
+    console.log(`Email User: ${process.env.EMAIL_USER}`);
+    console.log(`Email Password: ${process.env.EMAIL_PASSWORD ? '***configured***' : '❌ NOT SET'}`);
+
+    try {
+      await transporter.verify();
+      console.log('✓ Email transporter verified successfully - emails will be sent');
+    } catch (error) {
+      console.error('✗ Email verification failed - emails will NOT be sent!');
+      console.error('Error:', error.message);
+      console.error('\nTo fix this:');
+      console.error('1. Ensure EMAIL_USER and EMAIL_PASSWORD are set in .env');
+      console.error('2. Use a Gmail App Password (not your regular password)');
+      console.error('3. Remove any spaces from the App Password');
+      console.error('4. Test with: curl -X POST http://localhost:3000/api/test-email');
+    }
+    console.log('===========================\n');
+  });
+}
+
+// Export for Vercel serverless
+module.exports = app;

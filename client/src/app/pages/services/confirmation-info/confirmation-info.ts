@@ -47,11 +47,45 @@ export class ConfirmationInfo implements OnInit {
 
       const duration = this.bookingService.getSelectedDuration();
       if (duration) {
-        this.clientInfo.amount = duration.price;
+        // Calculate total price based on number of selected slots
+        this.clientInfo.amount = duration.price * this.selectedSlots.length;
       }
     } else {
       this.router.navigate(['/reserver']);
     }
+  }
+
+  getSinglePrice(): number {
+    const duration = this.bookingService.getSelectedDuration();
+    return duration ? duration.price : 0;
+  }
+
+  getTotalPrice(): number {
+    return this.clientInfo.amount ?? 0;
+  }
+
+  getFormattedTimeSlot(slot: any): string {
+    const start = new Date(slot.date);
+    const end = new Date(slot.end);
+
+    const dateStr = start.toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+
+    const startTime = start.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    const endTime = end.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    return `${dateStr} - ${startTime} à ${endTime}`;
   }
 
   async submitForm() {

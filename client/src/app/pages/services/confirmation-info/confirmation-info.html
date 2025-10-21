@@ -104,8 +104,19 @@
     <div class="booking-summary">
       <h3>Résumé de votre réservation</h3>
       <p><strong>Service:</strong> {{ clientInfo.service }}</p>
-      <p><strong>Date et heure:</strong> {{ clientInfo.timeSlot }}</p>
-      <p><strong>Prix:</strong> {{ (clientInfo.amount || 0) / 100 | currency:'CAD':'symbol':'1.2-2' }}</p>
+      <p><strong>Nombre de créneaux:</strong> {{ selectedSlots.length }}</p>
+
+      <div class="slots-list">
+        <div *ngFor="let slot of selectedSlots; let i = index" class="slot-item">
+          <span class="slot-number">{{ i + 1 }}.</span>
+          <span class="slot-details">{{ getFormattedTimeSlot(slot) }}</span>
+        </div>
+      </div>
+
+      <div class="pricing-details">
+        <p><strong>Prix par créneau:</strong> {{ getSinglePrice() / 100 | currency:'CAD':'symbol':'1.2-2' }}</p>
+        <p class="total-price"><strong>Prix total:</strong> {{ getTotalPrice() / 100 | currency:'CAD':'symbol':'1.2-2' }}</p>
+      </div>
     </div>
 
     <!-- Error message -->

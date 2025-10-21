@@ -254,7 +254,7 @@ async function updateCalendarSlot(clientInfo) {
   }
 }
 
-async function sendConfirmationEmail(clientInfo) {
+async function sendConfirmationEmail(clientInfo, paymentAmount) {
   try {
     console.log('Sending confirmation email to:', clientInfo.email);
 
@@ -271,11 +271,20 @@ async function sendConfirmationEmail(clientInfo) {
       minute: '2-digit'
     });
 
+    const appointmentEndDate = clientInfo.timeSlotEnd ? new Date(clientInfo.timeSlotEnd) : null;
+    const formattedEndTime = appointmentEndDate ? appointmentEndDate.toLocaleTimeString('fr-CA', {
+      hour: '2-digit',
+      minute: '2-digit'
+    }) : null;
+
+    // Format payment amount
+    const formattedAmount = paymentAmount ? `${(paymentAmount / 100).toFixed(2)} $` : 'N/A';
+
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
         <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
           <h1 style="color: #2c3e50; text-align: center; margin-bottom: 30px;">
-            ✅ Réservation Confirmée
+            ✅ Paiement et Réservation Confirmés
           </h1>
 
           <p style="font-size: 16px; color: #555; margin-bottom: 20px;">
@@ -283,16 +292,23 @@ async function sendConfirmationEmail(clientInfo) {
           </p>
 
           <p style="font-size: 16px; color: #555; margin-bottom: 25px;">
-            Votre réservation a été confirmée avec succès ! Voici les détails de votre rendez-vous :
+            Votre paiement a été traité avec succès et votre réservation est confirmée ! Voici les détails :
           </p>
 
-          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #28a745;">
-            <h3 style="color: #28a745; margin-top: 0;">Détails de la réservation</h3>
+          <div style="background-color: #d4edda; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #28a745;">
+            <h3 style="color: #28a745; margin-top: 0;">✓ Paiement Confirmé</h3>
+            <p style="margin: 8px 0;"><strong>Montant payé :</strong> ${formattedAmount} CAD</p>
+            <p style="margin: 8px 0; font-size: 14px; color: #666;">Votre transaction a été traitée de manière sécurisée.</p>
+          </div>
+
+          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #8B8672;">
+            <h3 style="color: #8B8672; margin-top: 0;">Détails de la réservation</h3>
             <p style="margin: 8px 0;"><strong>Service :</strong> ${clientInfo.service}</p>
             <p style="margin: 8px 0;"><strong>Date :</strong> ${formattedDate}</p>
-            <p style="margin: 8px 0;"><strong>Heure :</strong> ${formattedTime}</p>
+            <p style="margin: 8px 0;"><strong>Heure :</strong> ${formattedTime}${formattedEndTime ? ` - ${formattedEndTime}` : ''}</p>
             <p style="margin: 8px 0;"><strong>Client :</strong> ${clientInfo.name}</p>
             <p style="margin: 8px 0;"><strong>Téléphone :</strong> ${clientInfo.phone}</p>
+            <p style="margin: 8px 0;"><strong>Email :</strong> ${clientInfo.email}</p>
           </div>
 
           <div style="background-color: #e3f2fd; padding: 15px; border-radius: 8px; margin: 25px 0;">
@@ -301,12 +317,13 @@ async function sendConfirmationEmail(clientInfo) {
               <li>Veuillez arriver 5 minutes avant votre rendez-vous</li>
               <li>N'hésitez pas à nous contacter si vous avez des questions</li>
               <li>En cas d'annulation, merci de nous prévenir au moins 24h à l'avance</li>
+              <li>Un reçu de paiement a été envoyé séparément par Stripe</li>
             </ul>
           </div>
 
           <div style="text-align: center; margin-top: 30px;">
             <p style="color: #777; font-size: 14px;">
-              Cet événement a été automatiquement ajouté à votre calendrier.
+              Cet événement a été automatiquement ajouté au calendrier.
             </p>
             <p style="color: #777; font-size: 14px;">
               Merci de votre confiance !
@@ -317,7 +334,7 @@ async function sendConfirmationEmail(clientInfo) {
 
           <div style="text-align: center; color: #999; font-size: 12px;">
             <p>Cet email de confirmation a été envoyé automatiquement.</p>
-            <p>Si vous avez des questions, répondez à cet email.</p>
+            <p>Si vous avez des questions, répondez à cet email ou contactez-nous au 819-918-6631.</p>
           </div>
         </div>
       </div>
@@ -326,15 +343,104 @@ async function sendConfirmationEmail(clientInfo) {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: clientInfo.email,
-      subject: `Confirmation de rendez-vous - ${clientInfo.service} - ${formattedDate}`,
+      subject: `✅ Paiement et Réservation Confirmés - ${clientInfo.service} - ${formattedDate}`,
       html: emailHtml
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully:', info.messageId);
+    console.log('Customer confirmation email sent successfully:', info.messageId);
     return true;
   } catch (error) {
     console.error('Error sending confirmation email:', error);
+    throw error;
+  }
+}
+
+async function sendOwnerNotification(clientInfo, paymentAmount) {
+  try {
+    console.log('Sending booking notification to owner');
+
+    const appointmentDate = new Date(clientInfo.timeSlot);
+    const formattedDate = appointmentDate.toLocaleDateString('fr-CA', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    const formattedTime = appointmentDate.toLocaleTimeString('fr-CA', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    const appointmentEndDate = clientInfo.timeSlotEnd ? new Date(clientInfo.timeSlotEnd) : null;
+    const formattedEndTime = appointmentEndDate ? appointmentEndDate.toLocaleTimeString('fr-CA', {
+      hour: '2-digit',
+      minute: '2-digit'
+    }) : null;
+
+    const formattedAmount = paymentAmount ? `${(paymentAmount / 100).toFixed(2)} $` : 'N/A';
+
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+        <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+          <h1 style="color: #2c3e50; text-align: center; margin-bottom: 30px;">
+            🔔 Nouvelle Réservation
+          </h1>
+
+          <p style="font-size: 16px; color: #555; margin-bottom: 25px;">
+            Un nouveau rendez-vous vient d'être réservé et payé :
+          </p>
+
+          <div style="background-color: #d4edda; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #28a745;">
+            <h3 style="color: #28a745; margin-top: 0;">Paiement Reçu</h3>
+            <p style="margin: 8px 0;"><strong>Montant :</strong> ${formattedAmount} CAD</p>
+          </div>
+
+          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #8B8672;">
+            <h3 style="color: #8B8672; margin-top: 0;">Détails du Rendez-vous</h3>
+            <p style="margin: 8px 0;"><strong>Service :</strong> ${clientInfo.service}</p>
+            <p style="margin: 8px 0;"><strong>Date :</strong> ${formattedDate}</p>
+            <p style="margin: 8px 0;"><strong>Heure :</strong> ${formattedTime}${formattedEndTime ? ` - ${formattedEndTime}` : ''}</p>
+          </div>
+
+          <div style="background-color: #fff3cd; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #ffc107;">
+            <h3 style="color: #856404; margin-top: 0;">Informations Client</h3>
+            <p style="margin: 8px 0;"><strong>Nom :</strong> ${clientInfo.name}</p>
+            <p style="margin: 8px 0;"><strong>Email :</strong> <a href="mailto:${clientInfo.email}">${clientInfo.email}</a></p>
+            <p style="margin: 8px 0;"><strong>Téléphone :</strong> ${clientInfo.phone}</p>
+            ${clientInfo.adresse ? `<p style="margin: 8px 0;"><strong>Adresse :</strong> ${clientInfo.adresse}</p>` : ''}
+            ${clientInfo.dateNaissance ? `<p style="margin: 8px 0;"><strong>Date de naissance :</strong> ${clientInfo.dateNaissance}</p>` : ''}
+          </div>
+
+          <div style="text-align: center; margin-top: 30px; padding: 15px; background-color: #e8f5e9; border-radius: 8px;">
+            <p style="color: #2e7d32; font-size: 14px; margin: 0;">
+              ✓ L'événement a été ajouté automatiquement à votre calendrier Google
+            </p>
+          </div>
+
+          <hr style="border: none; height: 1px; background-color: #eee; margin: 30px 0;">
+
+          <div style="text-align: center; color: #999; font-size: 12px;">
+            <p>Cette notification a été générée automatiquement par le système de réservation.</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: 'skyzbelow@gmail.com',
+      subject: `🔔 Nouvelle Réservation - ${clientInfo.name} - ${formattedDate}`,
+      html: emailHtml,
+      replyTo: clientInfo.email
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Owner notification email sent successfully:', info.messageId);
+    return true;
+  } catch (error) {
+    console.error('Error sending owner notification email:', error);
     throw error;
   }
 }
@@ -354,18 +460,24 @@ app.post('/api/update-calendar', (req, res) => {
   res.json({ success: true });
 });
 
-app.post('/api/send-confirmation-email', (req, res) => {
-  const emailData = req.body;
+app.post('/api/send-confirmation-email', async (req, res) => {
+  try {
+    const emailData = req.body;
 
-  sendConfirmationEmail({
-    name: emailData.client_name,
-    email: emailData.to_email,
-    phone: emailData.phone,
-    service: emailData.service,
-    timeSlot: emailData.time_slot
-  });
+    await sendConfirmationEmail({
+      name: emailData.client_name,
+      email: emailData.to_email,
+      phone: emailData.phone,
+      service: emailData.service,
+      timeSlot: emailData.time_slot,
+      timeSlotEnd: emailData.time_slot_end
+    }, emailData.amount);
 
-  res.json({ success: true });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error sending confirmation email:', error);
+    res.status(500).json({ error: 'Failed to send email' });
+  }
 });
 
 app.get('/api/verify-payment/:sessionId', async (req, res) => {
@@ -384,13 +496,26 @@ app.get('/api/verify-payment/:sessionId', async (req, res) => {
         timeSlotEnd: session.metadata.time_slot_end
       };
 
+      const paymentAmount = session.amount_total;
+
       try {
         // Update calendar immediately after payment verification
         await updateCalendarSlot(clientInfo);
         console.log('Calendar updated successfully for:', clientInfo.name);
 
-        // Send confirmation email
-        console.log('Skipping email sending for now due to authentication issue');
+        // Send confirmation emails
+        try {
+          // Send email to customer
+          await sendConfirmationEmail(clientInfo, paymentAmount);
+          console.log('Customer confirmation email sent');
+
+          // Send notification to owner
+          await sendOwnerNotification(clientInfo, paymentAmount);
+          console.log('Owner notification email sent');
+        } catch (emailError) {
+          console.error('Error sending emails:', emailError);
+          // Don't throw - calendar update succeeded and payment is complete
+        }
 
       } catch (bookingError) {
         console.error('Error processing booking after payment:', bookingError);

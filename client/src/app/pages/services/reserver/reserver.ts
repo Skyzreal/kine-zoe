@@ -123,6 +123,20 @@ export class ReserverComponent implements OnInit {
     return this.serviceInfo?.price || 12000;
   }
 
+  getTotalPrice(): number {
+    return this.getSelectedPrice() * this.selectedSlots.length;
+  }
+
+  getFormattedTotalPrice(): string {
+    const total = this.getTotalPrice() / 100;
+    return `${total}$`;
+  }
+
+  getFormattedSinglePrice(): string {
+    const price = this.getSelectedPrice() / 100;
+    return `${price}$`;
+  }
+
   canSelectMoreSlots(): boolean {
     return true;
   }

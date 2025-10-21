@@ -140,6 +140,11 @@
         </div>
       </div>
 
+      <div class="pricing-summary">
+        <p><strong>Prix par créneau :</strong> {{ getFormattedSinglePrice() }}</p>
+        <p class="total-price"><strong>Prix total :</strong> {{ getFormattedTotalPrice() }}</p>
+      </div>
+
       <button (click)="confirmBooking()" class="confirm-btn">
         Confirmer {{ selectedSlots.length === 1 ? 'ce créneau' : 'ces créneaux' }}
       </button>

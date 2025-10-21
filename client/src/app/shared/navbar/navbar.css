@@ -106,7 +106,7 @@
   font-weight: bold;
   font-size: 1rem;
   border: 1px solid var(--color-primary, #8B8672);
-  color: var(--color-white, white);
+  color: var(--color-white, white) !important;
   transition: all 0.3s ease;
   text-align: left;
 }
@@ -120,7 +120,7 @@
 .cta:hover {
   transform: none;
   background-color: var(--color-primary-dark, #6B6652);
-  color: var(--color-white, white);
+  color: var(--color-white, white) !important;
   text-decoration: none;
 }
 
@@ -153,7 +153,7 @@
   .cta:hover {
     transform: scale(1.05);
     background-color: var(--color-primary-dark, #6B6652);
-    color: var(--color-white, white);
+    color: var(--color-white, white) !important;
     border-color: var(--color-primary-dark, #6B6652);
   }
 

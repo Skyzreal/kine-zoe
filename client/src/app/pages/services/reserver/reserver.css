@@ -1,8 +1,14 @@
 
 .time-slots-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.5rem;
+}
+
+@media (min-width: 1200px) {
+  .time-slots-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }.reserver-container {
    padding: 120px 5% 4rem;
    font-family: var(--font-primary, 'Cormorant', serif);
@@ -86,7 +92,7 @@
 
 .service-description {
   font-size: 1rem;
-  color: #555;
+  color: #333;
   line-height: 1.6;
   max-width: 500px;
   margin: 0 auto;
@@ -593,6 +599,28 @@
   border-bottom: none;
 }
 
+.pricing-summary {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(139, 134, 114, 0.1);
+  border-radius: 8px;
+  border-left: 3px solid var(--color-primary, #8B8672);
+}
+
+.pricing-summary p {
+  margin: 0.5rem 0;
+  color: #333;
+  font-size: 15px;
+}
+
+.pricing-summary .total-price {
+  font-size: 18px;
+  color: var(--color-primary, #8B8672);
+  margin-top: 0.8rem;
+  padding-top: 0.8rem;
+  border-top: 2px solid rgba(139, 134, 114, 0.3);
+}
+
 .summary-box {
   background: #fff7d6;
   padding: 2rem;
@@ -699,6 +727,10 @@
   .reserver-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+  }
+
+  .time-slots-list {
+    grid-template-columns: 1fr;
   }
 
   .calendar-grid {

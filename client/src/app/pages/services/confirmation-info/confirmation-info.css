@@ -103,3 +103,111 @@
   bottom: -80px;
   right: -60px;
 }
+
+.booking-summary {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: var(--color-background, #F5EFE7);
+  border-radius: 8px;
+  border: 1px solid rgba(139, 134, 114, 0.2);
+  text-align: left;
+}
+
+.booking-summary h3 {
+  margin-bottom: 1rem;
+  color: var(--color-primary, #8B8672);
+  text-align: center;
+}
+
+.booking-summary p {
+  margin: 0.5rem 0;
+  color: #333;
+}
+
+.slots-list {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: white;
+  border-radius: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.slot-item {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: 0.9rem;
+}
+
+.slot-item:last-child {
+  border-bottom: none;
+}
+
+.slot-number {
+  font-weight: 600;
+  color: var(--color-primary, #8B8672);
+  min-width: 20px;
+}
+
+.slot-details {
+  color: #555;
+  flex: 1;
+}
+
+.pricing-details {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 2px solid rgba(139, 134, 114, 0.3);
+}
+
+.pricing-details p {
+  margin: 0.5rem 0;
+}
+
+.pricing-details .total-price {
+  font-size: 1.15rem;
+  color: var(--color-primary, #8B8672);
+  margin-top: 0.8rem;
+  padding-top: 0.5rem;
+}
+
+.error-message {
+  background: #ffebee;
+  color: #d32f2f;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+  border: 1px solid #ffcdd2;
+}
+
+.submit-btn {
+  margin-top: 1rem !important;
+}
+
+.submit-btn:disabled {
+  background: #ccc;
+  border-color: #ccc;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.confirmation-details {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(139, 134, 114, 0.1);
+}
+
+.confirmation-details h3 {
+  color: var(--color-primary, #8B8672);
+  margin-bottom: 1rem;
+}
+
+.confirmation-details p {
+  margin: 0.5rem 0;
+  color: #333;
+}

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { EnvironmentService } from '../../shared/services/environment.service';
 
 @Component({
   selector: 'app-contact',
@@ -17,7 +18,7 @@ export class Contact {
   submitSuccess: boolean = false;
   submitError: boolean = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private env: EnvironmentService) {}
 
   async onSubmit() {
     if (!this.name || !this.email || !this.message) {
@@ -29,7 +30,7 @@ export class Contact {
     this.submitError = false;
 
     try {
-      await this.http.post('http://localhost:3000/api/contact', {
+      await this.http.post(`${this.env.apiBaseUrl}/api/contact`, {
         name: this.name,
         email: this.email,
         message: this.message

@@ -115,8 +115,16 @@
 
       <div class="pricing-details">
         <p><strong>Prix par créneau:</strong> {{ getSinglePrice() / 100 | currency:'CAD':'symbol':'1.2-2' }}</p>
-        <p class="total-price"><strong>Prix total:</strong> {{ getTotalPrice() / 100 | currency:'CAD':'symbol':'1.2-2' }}</p>
+        <p class="total-price"><strong>Prix total:</strong> {{ testMode ? 0.05 : (getTotalPrice() / 100) | currency:'CAD':'symbol':'1.2-2' }}</p>
       </div>
+    </div>
+
+    <!-- Test Mode Toggle -->
+    <div class="test-mode-toggle">
+      <label class="checkbox-label">
+        <input type="checkbox" [(ngModel)]="testMode" name="testMode" />
+        <span class="test-mode-text">Mode Test - Payer seulement $0.05 CAD</span>
+      </label>
     </div>
 
     <!-- Error message -->

@@ -211,3 +211,32 @@
   margin: 0.5rem 0;
   color: #333;
 }
+
+.test-mode-toggle {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #ffc107;
+}
+
+.test-mode-text {
+  font-weight: 600;
+  color: #856404;
+  font-size: 0.95rem;
+}

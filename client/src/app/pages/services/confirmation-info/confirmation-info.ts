@@ -24,6 +24,7 @@ export class ConfirmationInfo implements OnInit {
   isProcessingPayment = false;
   paymentError = '';
   selectedSlots: any[] = [];
+  testMode = false;
 
   clientInfo: ClientInfo = {
     prenom: '',
@@ -93,7 +94,13 @@ export class ConfirmationInfo implements OnInit {
     this.paymentError = '';
 
     try {
-      const session = await this.stripeService.createPaymentSession(this.clientInfo);
+      // Use 5 cents if test mode is enabled, otherwise use actual amount
+      const paymentInfo = {
+        ...this.clientInfo,
+        amount: this.testMode ? 5 : this.clientInfo.amount
+      };
+
+      const session = await this.stripeService.createPaymentSession(paymentInfo);
       await this.stripeService.redirectToCheckout(session.sessionId);
     } catch (error: any) {
       console.error('Payment error:', error);

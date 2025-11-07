@@ -562,6 +562,71 @@ app.get('/api/verify-payment/:sessionId', async (req, res) => {
 });
 
 /**
+ * Remove portions of FREE slots that overlap with booked events
+ * This ensures bookings from other platforms make those times unavailable
+ *
+ * @param {Array} freeSlots - Array of FREE calendar events
+ * @param {Array} bookedEvents - Array of non-FREE calendar events
+ * @returns {Array} - Array of FREE slots with overlaps removed
+ */
+function removeOverlappingTimes(freeSlots, bookedEvents) {
+  const result = [];
+
+  freeSlots.forEach(freeSlot => {
+    const freeStart = new Date(freeSlot.date);
+    const freeEnd = new Date(freeSlot.end);
+
+    // Find all booked events that overlap with this FREE slot
+    const overlaps = bookedEvents.filter(booked => {
+      const bookedStart = new Date(booked.date);
+      const bookedEnd = new Date(booked.end);
+      // Check if there's any overlap
+      return bookedStart < freeEnd && bookedEnd > freeStart;
+    });
+
+    if (overlaps.length === 0) {
+      // No overlaps, keep the entire FREE slot
+      result.push(freeSlot);
+      return;
+    }
+
+    // Sort overlaps by start time
+    overlaps.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // Split the FREE slot around the booked events
+    let currentStart = freeStart;
+
+    overlaps.forEach(overlap => {
+      const overlapStart = new Date(overlap.date);
+      const overlapEnd = new Date(overlap.end);
+
+      // If there's a gap before this overlap, add it as a FREE slot
+      if (currentStart < overlapStart) {
+        result.push({
+          date: currentStart.toISOString(),
+          end: overlapStart.toISOString(),
+          summary: freeSlot.summary
+        });
+      }
+
+      // Move past this booked event
+      currentStart = overlapEnd > currentStart ? overlapEnd : currentStart;
+    });
+
+    // If there's time remaining after the last overlap, add it
+    if (currentStart < freeEnd) {
+      result.push({
+        date: currentStart.toISOString(),
+        end: freeEnd.toISOString(),
+        summary: freeSlot.summary
+      });
+    }
+  });
+
+  return result;
+}
+
+/**
  * Smart time slot splitting algorithm
  * Breaks large FREE blocks into bookable slots while preventing awkward gaps
  *
@@ -674,6 +739,7 @@ app.get('/availability', async (req, res) => {
     const events = response.data.items || [];
     console.log('Number of events found:', events.length);
 
+    // Separate FREE slots from booked events
     const freeSlots = events
       .filter(e => (e.summary || '').toLowerCase().includes('free'))
       .map(e => ({
@@ -682,10 +748,23 @@ app.get('/availability', async (req, res) => {
         summary: e.summary
       }));
 
-    console.log('Free slots found (before splitting):', freeSlots.length);
+    const bookedEvents = events
+      .filter(e => !(e.summary || '').toLowerCase().includes('free'))
+      .map(e => ({
+        date: e.start.dateTime || e.start.date,
+        end: e.end.dateTime || e.end.date,
+        summary: e.summary
+      }));
+
+    console.log('Free slots found:', freeSlots.length);
+    console.log('Booked events found:', bookedEvents.length);
+
+    // Remove times that overlap with booked events
+    const availableSlots = removeOverlappingTimes(freeSlots, bookedEvents);
+    console.log('Available slots after removing overlaps:', availableSlots.length);
 
     // Apply smart slot splitting
-    const splitSlots = splitFreeSlots(freeSlots);
+    const splitSlots = splitFreeSlots(availableSlots);
     console.log('Free slots after splitting:', splitSlots.length);
 
     if (splitSlots.length > 0) {
@@ -750,6 +829,8 @@ app.get('/availability/:months', async (req, res) => {
     });
 
     const events = response.data.items || [];
+
+    // Separate FREE slots from booked events
     const freeSlots = events
       .filter(e => (e.summary || '').toLowerCase().includes('free'))
       .map(e => ({
@@ -758,8 +839,23 @@ app.get('/availability/:months', async (req, res) => {
         summary: e.summary
       }));
 
+    const bookedEvents = events
+      .filter(e => !(e.summary || '').toLowerCase().includes('free'))
+      .map(e => ({
+        date: e.start.dateTime || e.start.date,
+        end: e.end.dateTime || e.end.date,
+        summary: e.summary
+      }));
+
+    console.log('Free slots found:', freeSlots.length);
+    console.log('Booked events found:', bookedEvents.length);
+
+    // Remove times that overlap with booked events
+    const availableSlots = removeOverlappingTimes(freeSlots, bookedEvents);
+    console.log('Available slots after removing overlaps:', availableSlots.length);
+
     // Apply smart slot splitting
-    const splitSlots = splitFreeSlots(freeSlots);
+    const splitSlots = splitFreeSlots(availableSlots);
     console.log('Free slots after splitting:', splitSlots.length);
 
     res.json(splitSlots);

@@ -94,10 +94,11 @@ export class ConfirmationInfo implements OnInit {
     this.paymentError = '';
 
     try {
-      // Use 5 cents if test mode is enabled, otherwise use actual amount
+      // Use 50 cents if test mode is enabled, otherwise use actual amount
+      // (Stripe minimum is $0.50 CAD)
       const paymentInfo = {
         ...this.clientInfo,
-        amount: this.testMode ? 5 : this.clientInfo.amount
+        amount: this.testMode ? 50 : this.clientInfo.amount
       };
 
       const session = await this.stripeService.createPaymentSession(paymentInfo);

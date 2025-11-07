@@ -103,23 +103,16 @@ app.post('/api/create-payment-session', async (req, res) => {
 
 async function updateCalendarSlot(clientInfo) {
   try {
-    console.log('Updating calendar for:', clientInfo);
-    console.log('timeSlotEnd received:', clientInfo.timeSlotEnd);
-
     const authClient = await auth.getClient();
     const calendarId = process.env.CALENDAR_ID;
 
     const startTime = new Date(clientInfo.timeSlot);
-    console.log('Parsed start time:', startTime.toISOString());
-    console.log('Raw timeSlotEnd value:', clientInfo.timeSlotEnd);
 
     let endTime;
     if (clientInfo.timeSlotEnd && clientInfo.timeSlotEnd !== clientInfo.timeSlot) {
       endTime = new Date(clientInfo.timeSlotEnd);
-      console.log('Using provided end time:', endTime.toISOString());
     } else {
       endTime = new Date(startTime.getTime() + 60*60*1000);
-      console.log('Using default 1-hour duration, end time:', endTime.toISOString());
     }
 
     // Search for events that overlap with the appointment time
@@ -128,7 +121,6 @@ async function updateCalendarSlot(clientInfo) {
     searchStartTime.setHours(0, 0, 0, 0); // Start of the day
     const searchEndTime = new Date(startTime);
     searchEndTime.setHours(23, 59, 59, 999); // End of the day
-    console.log('Searching for existing events on:', searchStartTime.toISOString(), 'to', searchEndTime.toISOString());
 
     const existingEvents = await calendar.events.list({
       auth: authClient,
@@ -154,7 +146,6 @@ async function updateCalendarSlot(clientInfo) {
     );
 
     if (existingClientEvent) {
-      console.log('Appointment already exists for this client at this time:', existingClientEvent.summary);
       return existingClientEvent;
     }
 
@@ -167,7 +158,6 @@ async function updateCalendarSlot(clientInfo) {
         calendarId,
         eventId: freeEvent.id,
       });
-      console.log('Deleted FREE event:', freeEvent.summary);
 
       const bufferEndTime = new Date(endTime.getTime() + 15*60*1000);
 
@@ -189,7 +179,6 @@ async function updateCalendarSlot(clientInfo) {
           calendarId,
           resource: beforeFreeEvent,
         });
-        console.log('Created FREE slot before appointment:', freeEventStart.toISOString(), 'to', startTime.toISOString());
       }
 
       if (bufferEndTime < freeEventEnd) {
@@ -210,7 +199,6 @@ async function updateCalendarSlot(clientInfo) {
           calendarId,
           resource: afterFreeEvent,
         });
-        console.log('Created FREE slot after appointment+buffer:', bufferEndTime.toISOString(), 'to', freeEventEnd.toISOString());
       }
     }
 
@@ -233,7 +221,6 @@ async function updateCalendarSlot(clientInfo) {
       resource: calendarEvent,
     });
 
-    console.log('Calendar event created:', result.data.htmlLink);
 
     const bufferStartTime = new Date(endTime);
     const bufferEndTime = new Date(endTime.getTime() + 15*60*1000);
@@ -258,8 +245,6 @@ async function updateCalendarSlot(clientInfo) {
       resource: bufferEvent,
     });
 
-    console.log('15-minute buffer event created');
-
     return result.data;
 
   } catch (error) {
@@ -270,8 +255,6 @@ async function updateCalendarSlot(clientInfo) {
 
 async function sendConfirmationEmail(clientInfo, paymentAmount) {
   try {
-    console.log('Sending confirmation email to:', clientInfo.email);
-
     const appointmentDate = new Date(clientInfo.timeSlot);
     const formattedDate = appointmentDate.toLocaleDateString('fr-CA', {
       weekday: 'long',
@@ -362,7 +345,6 @@ async function sendConfirmationEmail(clientInfo, paymentAmount) {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log('Customer confirmation email sent successfully:', info.messageId);
     return true;
   } catch (error) {
     console.error('Error sending confirmation email:', error);
@@ -372,8 +354,6 @@ async function sendConfirmationEmail(clientInfo, paymentAmount) {
 
 async function sendOwnerNotification(clientInfo, paymentAmount) {
   try {
-    console.log('Sending booking notification to owner');
-
     const appointmentDate = new Date(clientInfo.timeSlot);
     const formattedDate = appointmentDate.toLocaleDateString('fr-CA', {
       weekday: 'long',
@@ -451,7 +431,6 @@ async function sendOwnerNotification(clientInfo, paymentAmount) {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log('Owner notification email sent successfully:', info.messageId);
     return true;
   } catch (error) {
     console.error('Error sending owner notification email:', error);
@@ -515,31 +494,21 @@ app.get('/api/verify-payment/:sessionId', async (req, res) => {
       try {
         // Update calendar immediately after payment verification
         await updateCalendarSlot(clientInfo);
-        console.log('✓ Calendar updated successfully for:', clientInfo.name);
 
         // Send confirmation emails
         try {
           // Send email to customer
-          console.log('Attempting to send customer confirmation email...');
           await sendConfirmationEmail(clientInfo, paymentAmount);
-          console.log('✓ Customer confirmation email sent successfully');
 
           // Send notification to owner
-          console.log('Attempting to send owner notification email...');
           await sendOwnerNotification(clientInfo, paymentAmount);
-          console.log('✓ Owner notification email sent successfully');
         } catch (emailError) {
-          console.error('✗ Error sending emails:', emailError.message);
-          console.error('Email error details:', {
-            code: emailError.code,
-            command: emailError.command,
-            response: emailError.response
-          });
+          console.error('Error sending emails:', emailError.message);
           // Don't throw - calendar update succeeded and payment is complete
         }
 
       } catch (bookingError) {
-        console.error('✗ Error processing booking after payment:', bookingError);
+        console.error('Error processing booking after payment:', bookingError);
         // Still return success since payment was completed
         // Calendar/email failures shouldn't affect the user experience
       }
@@ -703,11 +672,7 @@ app.get('/availability', async (req, res) => {
   const calendarId = process.env.CALENDAR_ID;
 
   try {
-    console.log('Getting auth client...');
     const authClient = await auth.getClient();
-    console.log('Auth client obtained successfully');
-
-    console.log('CALENDAR_ID:', calendarId);
 
     if (!calendarId) {
       return res.status(400).json({ error: 'CALENDAR_ID not found in environment variables' });
@@ -722,9 +687,6 @@ app.get('/availability', async (req, res) => {
     oneMonthLater.setMonth(now.getMonth() + 1);
     oneMonthLater.setHours(23, 59, 59, 999);
 
-    console.log('Making calendar API request...');
-    console.log('Time range (with 2-day notice):', startDate.toISOString(), 'to', oneMonthLater.toISOString());
-
     const response = await calendar.events.list({
       auth: authClient,
       calendarId,
@@ -735,9 +697,7 @@ app.get('/availability', async (req, res) => {
       maxResults: 2500,
     });
 
-    console.log('Calendar API response received');
     const events = response.data.items || [];
-    console.log('Number of events found:', events.length);
 
     // Separate FREE slots from booked events
     const freeSlots = events
@@ -756,38 +716,15 @@ app.get('/availability', async (req, res) => {
         summary: e.summary
       }));
 
-    console.log('Free slots found:', freeSlots.length);
-    console.log('Booked events found:', bookedEvents.length);
-
     // Remove times that overlap with booked events
     const availableSlots = removeOverlappingTimes(freeSlots, bookedEvents);
-    console.log('Available slots after removing overlaps:', availableSlots.length);
 
     // Apply smart slot splitting
     const splitSlots = splitFreeSlots(availableSlots);
-    console.log('Free slots after splitting:', splitSlots.length);
-
-    if (splitSlots.length > 0) {
-      console.log('Sample split slots:');
-      splitSlots.slice(0, 5).forEach((slot, index) => {
-        console.log(`${index + 1}. ${slot.date} - ${slot.end} (${slot.summary})`);
-      });
-    }
 
     res.json(splitSlots);
   } catch (error) {
-    console.error('=== DETAILED ERROR INFO ===');
-    console.error('Error message:', error.message);
-    console.error('Error code:', error.code);
-    console.error('Error status:', error.status);
-
-    if (error.response) {
-      console.error('Response status:', error.response.status);
-      console.error('Response data:', JSON.stringify(error.response.data, null, 2));
-    }
-
-    console.error('Full error:', error);
-    console.error('=========================');
+    console.error('Error fetching calendar availability:', error.message);
 
     res.status(500).json({
       error: 'Failed to fetch calendar events',
@@ -814,9 +751,6 @@ app.get('/availability/:months', async (req, res) => {
     const futureDate = new Date();
     futureDate.setMonth(now.getMonth() + monthsAhead);
     futureDate.setHours(23, 59, 59, 999);
-
-    console.log(`Getting availability for ${monthsAhead} month(s) ahead (with 2-day notice)`);
-    console.log('Time range:', startDate.toISOString(), 'to', futureDate.toISOString());
 
     const response = await calendar.events.list({
       auth: authClient,
@@ -847,16 +781,11 @@ app.get('/availability/:months', async (req, res) => {
         summary: e.summary
       }));
 
-    console.log('Free slots found:', freeSlots.length);
-    console.log('Booked events found:', bookedEvents.length);
-
     // Remove times that overlap with booked events
     const availableSlots = removeOverlappingTimes(freeSlots, bookedEvents);
-    console.log('Available slots after removing overlaps:', availableSlots.length);
 
     // Apply smart slot splitting
     const splitSlots = splitFreeSlots(availableSlots);
-    console.log('Free slots after splitting:', splitSlots.length);
 
     res.json(splitSlots);
   } catch (error) {
@@ -870,11 +799,8 @@ app.get('/availability/:months', async (req, res) => {
 
 app.post('/api/test-email', async (req, res) => {
   try {
-    console.log('Testing email configuration...');
-
     // Test email credentials
     await transporter.verify();
-    console.log('✓ Email transporter verified successfully');
 
     // Send test email
     const testMailOptions = {
@@ -892,7 +818,6 @@ app.post('/api/test-email', async (req, res) => {
     };
 
     const info = await transporter.sendMail(testMailOptions);
-    console.log('✓ Test email sent successfully:', info.messageId);
 
     res.json({
       success: true,
@@ -900,7 +825,7 @@ app.post('/api/test-email', async (req, res) => {
       messageId: info.messageId
     });
   } catch (error) {
-    console.error('✗ Email configuration test failed:', error);
+    console.error('Email configuration test failed:', error);
     res.status(500).json({
       error: 'Email configuration test failed',
       details: error.message,
@@ -938,7 +863,6 @@ app.post('/api/contact', async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
-    console.log('Contact form email sent successfully');
 
     res.json({ success: true, message: 'Email sent successfully' });
   } catch (error) {

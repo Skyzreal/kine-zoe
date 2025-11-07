@@ -41,7 +41,6 @@ export class Success implements OnInit {
         this.errorMessage = 'Payment was not successful';
       }
     } catch (error: any) {
-      console.error('Error verifying payment:', error);
       this.errorMessage = error.message || 'Failed to verify payment';
     } finally {
       this.isLoading = false;
@@ -51,7 +50,6 @@ export class Success implements OnInit {
   private async finalizeBooking() {
     // Calendar update and email sending are now handled server-side
     // during payment verification for better reliability
-    console.log('Booking finalized for:', this.clientInfo.name);
   }
 
   goHome() {

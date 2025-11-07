@@ -151,14 +151,10 @@ export class ReserverComponent implements OnInit {
         this.groupSlotsByDay();
         this.generateCalendarDays();
         this.loading = false;
-        console.log('FREE slots:', this.freeEvents);
-        console.log('Grouped slots:', this.groupedSlots);
-        console.log('Calendar days:', this.calendarDays);
       },
       error: (err) => {
         this.error = 'Impossible de charger les créneaux disponibles';
         this.loading = false;
-        console.error('Error loading availability:', err);
       }
     });
   }
@@ -287,8 +283,6 @@ export class ReserverComponent implements OnInit {
         }
       }
     }
-
-    console.log('Selected slots:', this.selectedSlots);
   }
 
   hasEnoughDuration(slot: TimeSlot): boolean {
@@ -331,8 +325,6 @@ export class ReserverComponent implements OnInit {
 
   confirmBooking() {
     if (this.selectedSlots.length > 0) {
-      console.log('Booking confirmed for slots:', this.selectedSlots);
-
       const duration: ServiceDuration = {
         duration: this.isMassageService() ? this.selectedDuration : (this.serviceInfo?.duration || 30),
         price: this.getSelectedPrice()

@@ -444,7 +444,7 @@ async function sendOwnerNotification(clientInfo, paymentAmount) {
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: 'skyzbelow@gmail.com',
+      to: process.env.OWNER_EMAIL || process.env.EMAIL_USER,
       subject: `🔔 Nouvelle Réservation - ${clientInfo.name} - ${formattedDate}`,
       html: emailHtml,
       replyTo: clientInfo.email
@@ -783,7 +783,7 @@ app.post('/api/test-email', async (req, res) => {
     // Send test email
     const testMailOptions = {
       from: process.env.EMAIL_USER,
-      to: 'skyzbelow@gmail.com',
+      to: process.env.OWNER_EMAIL || process.env.EMAIL_USER,
       subject: 'Test Email - Configuration Verification',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -823,7 +823,7 @@ app.post('/api/contact', async (req, res) => {
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: 'skyzbelow@gmail.com',
+      to: process.env.OWNER_EMAIL || process.env.EMAIL_USER,
       subject: `Contact Form Submission from ${name}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">

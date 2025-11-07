@@ -31,11 +31,11 @@ interface CalendarDay {
   standalone: true,
   templateUrl: './reserver.html',
   styleUrl: './reserver.css',
-  imports: [RouterLink, CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule]
 })
 export class ReserverComponent implements OnInit {
   selectedService: string | null = null;
-  serviceInfo: {title: string, description: string, icon: string, color: string, price?: number, duration?: number} | null = null;
+  serviceInfo: {title: string, description: string, icon: string, color: string, price?: number, duration?: number, isFree?: boolean} | null = null;
   freeEvents: TimeSlot[] = [];
   groupedSlots: DaySlots[] = [];
   calendarDays: CalendarDay[] = [];

@@ -583,8 +583,9 @@
 .booking-summary {
   margin: 1rem 0;
   padding: 1rem;
-  background: rgba(244, 236, 157, 0.3);
+  background: rgba(139, 134, 114, 0.08);
   border-radius: 8px;
+  border: 1px solid rgba(139, 134, 114, 0.15);
 }
 
 .booking-item {

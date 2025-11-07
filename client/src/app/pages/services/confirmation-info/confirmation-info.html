@@ -113,14 +113,19 @@
         </div>
       </div>
 
-      <div class="pricing-details">
+      <div class="pricing-details" *ngIf="!isFreeBooking()">
         <p><strong>Prix par créneau:</strong> {{ getSinglePrice() / 100 | currency:'CAD':'symbol':'1.2-2' }}</p>
         <p class="total-price"><strong>Prix total:</strong> {{ testMode ? 0.50 : (getTotalPrice() / 100) | currency:'CAD':'symbol':'1.2-2' }}</p>
       </div>
+
+      <div class="pricing-details free-booking" *ngIf="isFreeBooking()">
+        <p class="free-price">✨ <strong>Session gratuite</strong> ✨</p>
+        <p class="free-note">Aucun paiement requis</p>
+      </div>
     </div>
 
-    <!-- Test Mode Toggle -->
-    <div class="test-mode-toggle">
+    <!-- Test Mode Toggle (only for paid bookings) -->
+    <div class="test-mode-toggle" *ngIf="!isFreeBooking()">
       <label class="checkbox-label">
         <input type="checkbox" [(ngModel)]="testMode" name="testMode" />
         <span class="test-mode-text">Mode Test - Payer seulement $0.50 CAD (minimum Stripe)</span>
@@ -136,8 +141,10 @@
       type="submit"
       [disabled]="!userForm.valid || isProcessingPayment"
       class="submit-btn"
+      [class.free-booking-btn]="isFreeBooking()"
     >
-      <span *ngIf="!isProcessingPayment">Procéder au paiement</span>
+      <span *ngIf="!isProcessingPayment && !isFreeBooking()">Procéder au paiement</span>
+      <span *ngIf="!isProcessingPayment && isFreeBooking()">Confirmer la réservation gratuite</span>
       <span *ngIf="isProcessingPayment">Traitement en cours...</span>
     </button>
   </form>

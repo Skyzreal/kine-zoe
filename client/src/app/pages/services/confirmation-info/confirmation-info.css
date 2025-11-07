@@ -173,6 +173,39 @@
   padding-top: 0.5rem;
 }
 
+.pricing-details.free-booking {
+  background: rgba(5, 150, 105, 0.1);
+  padding: 1rem;
+  border-radius: 6px;
+  border-top: none;
+  margin-top: 1rem;
+}
+
+.free-price {
+  font-size: 1.3rem;
+  color: #059669;
+  text-align: center;
+  margin: 0.5rem 0 !important;
+  font-weight: 600;
+}
+
+.free-note {
+  font-size: 0.95rem;
+  color: #059669;
+  text-align: center;
+  margin-top: 0.5rem !important;
+}
+
+.submit-btn.free-booking-btn {
+  background: #059669 !important;
+  border-color: #059669 !important;
+}
+
+.submit-btn.free-booking-btn:hover:not(:disabled) {
+  background: #047857 !important;
+  border-color: #047857 !important;
+}
+
 .error-message {
   background: #ffebee;
   color: #d32f2f;

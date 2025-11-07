@@ -173,10 +173,38 @@
   margin-bottom: 0.5rem;
 }
 
+.price-info.free-service {
+  color: #059669;
+  font-size: 1.3rem;
+}
+
+.free-service-note {
+  font-size: 0.9rem;
+  color: #666;
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
 .booking-note {
   font-size: 0.9rem;
   color: #666;
   font-style: italic;
+}
+
+.pricing-summary.free-booking {
+  background: rgba(5, 150, 105, 0.1);
+  border-left-color: #059669;
+}
+
+.free-price {
+  font-size: 1.3rem;
+  color: #059669;
+}
+
+.free-note {
+  font-size: 0.95rem;
+  color: #059669;
+  margin-top: 0.5rem;
 }
 
 .default-header {

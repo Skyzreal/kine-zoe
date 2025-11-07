@@ -19,7 +19,6 @@ export class NavbarComponent {
   closeMenu() {
     this.menuOpen = false;
   }
-  //TODO: Fix it so it also works when the main nav (top) is clicked
   @HostListener('document:click', ['$event'])
   handleClickOutside(event: MouseEvent) {
     const target = event.target as HTMLElement;

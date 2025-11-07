@@ -22,8 +22,10 @@
       </div>
     </div>
 
-    <div *ngIf="!isMassageService() && serviceInfo.price" class="service-pricing">
-      <p class="price-info">30 minutes - {{ serviceInfo.price / 100 }}$</p>
+    <div *ngIf="!isMassageService() && serviceInfo.price !== undefined" class="service-pricing">
+      <p class="price-info" *ngIf="!isFreeService()">30 minutes - {{ serviceInfo.price / 100 }}$</p>
+      <p class="price-info free-service" *ngIf="isFreeService()">✨ Session gratuite - 0$ ✨</p>
+      <p class="free-service-note" *ngIf="isFreeService()">Vous ne pouvez réserver qu'une seule session gratuite</p>
     </div>
   </div>
 
@@ -140,13 +142,18 @@
         </div>
       </div>
 
-      <div class="pricing-summary">
+      <div class="pricing-summary" *ngIf="!isFreeService()">
         <p><strong>Prix par créneau :</strong> {{ getFormattedSinglePrice() }}</p>
         <p class="total-price"><strong>Prix total :</strong> {{ getFormattedTotalPrice() }}</p>
       </div>
 
+      <div class="pricing-summary free-booking" *ngIf="isFreeService()">
+        <p class="free-price">✨ <strong>Session gratuite</strong> ✨</p>
+        <p class="free-note">Aucun paiement requis</p>
+      </div>
+
       <button (click)="confirmBooking()" class="confirm-btn">
-        Confirmer {{ selectedSlots.length === 1 ? 'ce créneau' : 'ces créneaux' }}
+        {{ isFreeService() ? 'Confirmer la réservation gratuite' : 'Confirmer ' + (selectedSlots.length === 1 ? 'ce créneau' : 'ces créneaux') }}
       </button>
     </div>
   </div>

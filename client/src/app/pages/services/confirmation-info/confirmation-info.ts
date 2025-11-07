@@ -94,19 +94,38 @@ export class ConfirmationInfo implements OnInit {
     this.paymentError = '';
 
     try {
-      // Use 50 cents if test mode is enabled, otherwise use actual amount
-      // (Stripe minimum is $0.50 CAD)
-      const paymentInfo = {
-        ...this.clientInfo,
-        amount: this.testMode ? 50 : this.clientInfo.amount
-      };
+      // Check if this is a free booking
+      if (this.isFreeBooking()) {
+        // Skip payment and create booking directly
+        const result = await this.stripeService.createFreeBooking(this.clientInfo);
 
-      const session = await this.stripeService.createPaymentSession(paymentInfo);
-      await this.stripeService.redirectToCheckout(session.sessionId);
+        if (result.success) {
+          // Navigate to success page with free booking flag
+          this.router.navigate(['/success'], {
+            queryParams: { free: 'true' }
+          });
+        } else {
+          throw new Error('Failed to create booking');
+        }
+      } else {
+        // Regular paid booking flow
+        // Use 50 cents if test mode is enabled, otherwise use actual amount
+        // (Stripe minimum is $0.50 CAD)
+        const paymentInfo = {
+          ...this.clientInfo,
+          amount: this.testMode ? 50 : this.clientInfo.amount
+        };
+
+        const session = await this.stripeService.createPaymentSession(paymentInfo);
+        await this.stripeService.redirectToCheckout(session.sessionId);
+      }
     } catch (error: any) {
-      console.error('Payment error:', error);
-      this.paymentError = error.message || 'Failed to process payment';
+      this.paymentError = error.message || 'Failed to process booking';
       this.isProcessingPayment = false;
     }
+  }
+
+  isFreeBooking(): boolean {
+    return !this.clientInfo.amount || this.clientInfo.amount === 0;
   }
 }

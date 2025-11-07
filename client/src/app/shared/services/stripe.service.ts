@@ -93,4 +93,28 @@ export class StripeService {
 
     return response;
   }
+
+  async createFreeBooking(clientInfo: ClientInfo): Promise<PaymentVerificationResult> {
+    const response = await this.http.post<PaymentVerificationResult>(
+      `${this.envService.apiBaseUrl}/api/create-free-booking`,
+      {
+        clientInfo: {
+          name: `${clientInfo.prenom} ${clientInfo.nom}`,
+          email: clientInfo.email,
+          phone: clientInfo.phone,
+          adresse: clientInfo.adresse,
+          dateNaissance: clientInfo.dateNaissance,
+          service: clientInfo.service,
+          timeSlot: clientInfo.timeSlot,
+          timeSlotEnd: clientInfo.timeSlotEnd
+        }
+      }
+    ).toPromise();
+
+    if (!response) {
+      throw new Error('Failed to create free booking');
+    }
+
+    return response;
+  }
 }

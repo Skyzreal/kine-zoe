@@ -35,6 +35,10 @@
   margin-bottom: 1rem;
 }
 
+.success-icon.free-icon {
+  color: #059669;
+}
+
 .success h1 {
   color: #166534;
   margin-bottom: 1rem;

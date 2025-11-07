@@ -18,9 +18,19 @@ export class Success implements OnInit {
   paymentSuccess = false;
   errorMessage = '';
   clientInfo: any = null;
+  isFreeBooking = false;
 
   async ngOnInit() {
     const sessionId = this.route.snapshot.queryParamMap.get('session_id');
+    const freeBooking = this.route.snapshot.queryParamMap.get('free');
+
+    // Handle free bookings
+    if (freeBooking === 'true') {
+      this.isFreeBooking = true;
+      this.paymentSuccess = true;
+      this.isLoading = false;
+      return;
+    }
 
     if (!sessionId) {
       this.errorMessage = 'No session ID provided';

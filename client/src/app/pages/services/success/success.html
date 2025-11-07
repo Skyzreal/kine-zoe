@@ -14,9 +14,10 @@
 
   <!-- Success State -->
   <div *ngIf="!isLoading && paymentSuccess" class="success">
-    <div class="success-icon">✓</div>
-    <h1>Paiement réussi!</h1>
-    <p class="success-message">Votre réservation a été confirmée avec succès.</p>
+    <div class="success-icon" [class.free-icon]="isFreeBooking">{{ isFreeBooking ? '✨' : '✓' }}</div>
+    <h1>{{ isFreeBooking ? 'Réservation Gratuite Confirmée !' : 'Paiement réussi!' }}</h1>
+    <p class="success-message" *ngIf="!isFreeBooking">Votre réservation a été confirmée avec succès.</p>
+    <p class="success-message" *ngIf="isFreeBooking">Votre réservation gratuite a été confirmée avec succès.</p>
     
     <div class="booking-details" *ngIf="clientInfo">
       <h3>Détails de votre rendez-vous</h3>

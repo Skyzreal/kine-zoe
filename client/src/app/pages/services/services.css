@@ -91,8 +91,21 @@
 
 .service-card p {
   font-size: 0.95rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   color: var(--color-text-medium, #6B6652);
+}
+
+.service-price {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-primary, #8B8672);
+  margin-bottom: 1.5rem;
+}
+
+.service-price.free {
+  color: #059669;
+  font-size: 1.2rem;
 }
 
 .service-card .btn {

@@ -275,13 +275,14 @@ async function sendConfirmationEmail(clientInfo, paymentAmount) {
     }) : null;
 
     // Format payment amount
-    const formattedAmount = paymentAmount ? `${(paymentAmount / 100).toFixed(2)} $` : 'N/A';
+    const formattedAmount = paymentAmount ? `${(paymentAmount / 100).toFixed(2)} $` : 'Gratuit';
+    const isFreeBooking = !paymentAmount || paymentAmount === 0;
 
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
         <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
           <h1 style="color: #2c3e50; text-align: center; margin-bottom: 30px;">
-            ✅ Paiement et Réservation Confirmés
+            ${isFreeBooking ? '✅ Réservation Confirmée' : '✅ Paiement et Réservation Confirmés'}
           </h1>
 
           <p style="font-size: 16px; color: #555; margin-bottom: 20px;">
@@ -289,14 +290,21 @@ async function sendConfirmationEmail(clientInfo, paymentAmount) {
           </p>
 
           <p style="font-size: 16px; color: #555; margin-bottom: 25px;">
-            Votre paiement a été traité avec succès et votre réservation est confirmée ! Voici les détails :
+            ${isFreeBooking ? 'Votre réservation gratuite est confirmée ! Voici les détails :' : 'Votre paiement a été traité avec succès et votre réservation est confirmée ! Voici les détails :'}
           </p>
 
+          ${isFreeBooking ? `
+          <div style="background-color: #d4edda; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #28a745;">
+            <h3 style="color: #28a745; margin-top: 0;">✨ Session Gratuite</h3>
+            <p style="margin: 8px 0; font-size: 14px; color: #666;">Cette session est offerte gratuitement.</p>
+          </div>
+          ` : `
           <div style="background-color: #d4edda; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #28a745;">
             <h3 style="color: #28a745; margin-top: 0;">✓ Paiement Confirmé</h3>
             <p style="margin: 8px 0;"><strong>Montant payé :</strong> ${formattedAmount} CAD</p>
             <p style="margin: 8px 0; font-size: 14px; color: #666;">Votre transaction a été traitée de manière sécurisée.</p>
           </div>
+          `}
 
           <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #8B8672;">
             <h3 style="color: #8B8672; margin-top: 0;">Détails de la réservation</h3>
@@ -314,7 +322,7 @@ async function sendConfirmationEmail(clientInfo, paymentAmount) {
               <li>Veuillez arriver 5 minutes avant votre rendez-vous</li>
               <li>N'hésitez pas à nous contacter si vous avez des questions</li>
               <li>En cas d'annulation, merci de nous prévenir au moins 24h à l'avance</li>
-              <li>Un reçu de paiement a été envoyé séparément par Stripe</li>
+              ${!isFreeBooking ? '<li>Un reçu de paiement a été envoyé séparément par Stripe</li>' : ''}
             </ul>
           </div>
 
@@ -340,7 +348,7 @@ async function sendConfirmationEmail(clientInfo, paymentAmount) {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: clientInfo.email,
-      subject: `✅ Paiement et Réservation Confirmés - ${clientInfo.service} - ${formattedDate}`,
+      subject: `${isFreeBooking ? '✅ Réservation Confirmée' : '✅ Paiement et Réservation Confirmés'} - ${clientInfo.service} - ${formattedDate}`,
       html: emailHtml
     };
 
@@ -373,7 +381,8 @@ async function sendOwnerNotification(clientInfo, paymentAmount) {
       minute: '2-digit'
     }) : null;
 
-    const formattedAmount = paymentAmount ? `${(paymentAmount / 100).toFixed(2)} $` : 'N/A';
+    const formattedAmount = paymentAmount ? `${(paymentAmount / 100).toFixed(2)} $` : 'Gratuit';
+    const isFreeBooking = !paymentAmount || paymentAmount === 0;
 
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
@@ -383,13 +392,20 @@ async function sendOwnerNotification(clientInfo, paymentAmount) {
           </h1>
 
           <p style="font-size: 16px; color: #555; margin-bottom: 25px;">
-            Un nouveau rendez-vous vient d'être réservé et payé :
+            Un nouveau rendez-vous vient d'être réservé${isFreeBooking ? ' (gratuit)' : ' et payé'} :
           </p>
 
+          ${isFreeBooking ? `
+          <div style="background-color: #d4edda; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #28a745;">
+            <h3 style="color: #28a745; margin-top: 0;">✨ Réservation Gratuite</h3>
+            <p style="margin: 8px 0; font-size: 14px; color: #666;">Aucun paiement requis</p>
+          </div>
+          ` : `
           <div style="background-color: #d4edda; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #28a745;">
             <h3 style="color: #28a745; margin-top: 0;">Paiement Reçu</h3>
             <p style="margin: 8px 0;"><strong>Montant :</strong> ${formattedAmount} CAD</p>
           </div>
+          `}
 
           <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #8B8672;">
             <h3 style="color: #8B8672; margin-top: 0;">Détails du Rendez-vous</h3>
@@ -437,6 +453,69 @@ async function sendOwnerNotification(clientInfo, paymentAmount) {
     throw error;
   }
 }
+
+app.post('/api/create-free-booking', async (req, res) => {
+  try {
+    const { clientInfo } = req.body;
+
+    if (!clientInfo || !clientInfo.name || !clientInfo.email || !clientInfo.timeSlot) {
+      return res.status(400).json({ error: 'Missing required client information' });
+    }
+
+    // Update calendar for free booking
+    await updateCalendarSlot({
+      name: clientInfo.name,
+      email: clientInfo.email,
+      phone: clientInfo.phone,
+      adresse: clientInfo.adresse,
+      dateNaissance: clientInfo.dateNaissance,
+      service: clientInfo.service,
+      timeSlot: clientInfo.timeSlot,
+      timeSlotEnd: clientInfo.timeSlotEnd
+    });
+
+    // Send confirmation email (without payment amount)
+    try {
+      await sendConfirmationEmail({
+        name: clientInfo.name,
+        email: clientInfo.email,
+        phone: clientInfo.phone,
+        service: clientInfo.service,
+        timeSlot: clientInfo.timeSlot,
+        timeSlotEnd: clientInfo.timeSlotEnd
+      }, 0); // 0 for free booking
+
+      await sendOwnerNotification({
+        name: clientInfo.name,
+        email: clientInfo.email,
+        phone: clientInfo.phone,
+        adresse: clientInfo.adresse,
+        dateNaissance: clientInfo.dateNaissance,
+        service: clientInfo.service,
+        timeSlot: clientInfo.timeSlot,
+        timeSlotEnd: clientInfo.timeSlotEnd
+      }, 0); // 0 for free booking
+    } catch (emailError) {
+      console.error('Error sending confirmation emails:', emailError);
+      // Don't fail the booking if email fails
+    }
+
+    res.json({
+      success: true,
+      clientInfo: {
+        name: clientInfo.name,
+        email: clientInfo.email,
+        phone: clientInfo.phone,
+        service: clientInfo.service,
+        timeSlot: clientInfo.timeSlot,
+        timeSlotEnd: clientInfo.timeSlotEnd
+      }
+    });
+  } catch (error) {
+    console.error('Error creating free booking:', error);
+    res.status(500).json({ error: 'Failed to create booking' });
+  }
+});
 
 app.post('/api/update-calendar', (req, res) => {
   const { timeSlot, status, service, clientInfo } = req.body;

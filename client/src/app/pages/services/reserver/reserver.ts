@@ -75,34 +75,35 @@ export class ReserverComponent implements OnInit {
   }
 
   setServiceInfo() {
-    const serviceInfoMap: {[key: string]: {title: string, description: string, icon: string, color: string, price?: number, duration?: number}} = {
+    const serviceInfoMap: {[key: string]: {title: string, description: string, icon: string, color: string, price?: number, duration?: number, isFree?: boolean}} = {
       'Remise en forme': {
         title: 'Remise en forme',
-        description: 'Retrouvez votre énergie et votre confiance grâce à un programme d\'entraînement personnalisé adapté à vos besoins. Nous vous accompagnons dans votre parcours de remise en forme avec des exercices ciblés et progressifs.',
+        description: 'Programme d\'entraînement structuré visant à améliorer la condition physique, la posture et la performance globale.',
         icon: '🏋️',
         color: 'pastel-blue',
-        price: 12000,
+        price: 15000,
         duration: 30
       },
-      'Réhabilitation': {
-        title: 'Réhabilitation',
-        description: 'Récupérez pleinement après une blessure ou une intervention chirurgicale. Nos programmes de rééducation personnalisés vous aident à retrouver votre mobilité et à prévenir les récidives.',
+      'Prévention et gestion des blessures': {
+        title: 'Prévention et gestion des blessures',
+        description: 'Processus de rééducation individualisé pour restaurer la mobilité, la force et la fonction après une blessure et prévenir les récidives.',
         icon: '🔄',
         color: 'pastel-yellow',
-        price: 12000,
+        price: 15000,
         duration: 30
       },
-      'Gestion des douleurs': {
-        title: 'Prévention et gestion de douleurs',
-        description: 'Soulagez vos douleurs chroniques et tensions grâce à notre approche thérapeutique active. Nous vous donnons les outils pour mieux gérer et prévenir les douleurs au quotidien.',
-        icon: '🛡️',
+      'Coaching - course à pied / triathlon': {
+        title: 'Coaching - course à pied / triathlon',
+        description: 'Accompagnement personnalisé en course à pied et triathlon pour optimiser la performance, la technique et la prévention des blessures.',
+        icon: '🏃',
         color: 'pastel-orange',
-        price: 12000,
-        duration: 30
+        price: 0,
+        duration: 30,
+        isFree: true
       },
       'Massage': {
         title: 'Massage thérapeutique',
-        description: 'Détendez-vous profondément et relâchez vos tensions musculaires avec nos massages thérapeutiques personnalisés. Une approche holistique pour votre bien-être physique et mental.',
+        description: 'Thérapie manuelle adaptée aux besoins musculaires pour réduire les tensions, favoriser la circulation et optimiser la récupération.',
         icon: '🤲',
         color: 'pastel-mint'
       }
@@ -113,6 +114,10 @@ export class ReserverComponent implements OnInit {
 
   isMassageService(): boolean {
     return this.selectedService === 'Massage';
+  }
+
+  isFreeService(): boolean {
+    return this.serviceInfo?.isFree === true;
   }
 
   getSelectedPrice(): number {
@@ -138,6 +143,10 @@ export class ReserverComponent implements OnInit {
   }
 
   canSelectMoreSlots(): boolean {
+    // Free services can only book 1 slot
+    if (this.isFreeService()) {
+      return this.selectedSlots.length < 1;
+    }
     return true;
   }
 

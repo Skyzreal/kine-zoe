@@ -125,7 +125,11 @@ export class ReserverComponent implements OnInit {
       const selected = this.massageDurations.find(d => d.duration === this.selectedDuration);
       return selected ? selected.price : 11000;
     }
-    return this.serviceInfo?.price || 12000;
+    // Return 0 for free services, otherwise return the service price
+    if (this.isFreeService()) {
+      return 0;
+    }
+    return this.serviceInfo?.price || 0;
   }
 
   getTotalPrice(): number {

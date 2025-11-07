@@ -36,7 +36,7 @@ export class ConfirmationInfo implements OnInit {
     service: 'Physiotherapy Session',
     timeSlot: '',
     timeSlotEnd: '',
-    amount: 1500
+    amount: 0
   };
 
   async ngOnInit() {
@@ -50,6 +50,12 @@ export class ConfirmationInfo implements OnInit {
       if (duration) {
         // Calculate total price based on number of selected slots
         this.clientInfo.amount = duration.price * this.selectedSlots.length;
+        console.log('Duration:', duration);
+        console.log('Calculated amount:', this.clientInfo.amount);
+      } else {
+        // If no duration provided, set amount to 0
+        this.clientInfo.amount = 0;
+        console.log('No duration, amount set to 0');
       }
     } else {
       this.router.navigate(['/reserver']);
@@ -93,6 +99,10 @@ export class ConfirmationInfo implements OnInit {
     this.isProcessingPayment = true;
     this.paymentError = '';
 
+    // Debug logging
+    console.log('Submit form - Amount:', this.clientInfo.amount);
+    console.log('Is free booking:', this.isFreeBooking());
+
     try {
       // Check if this is a free booking
       if (this.isFreeBooking()) {
@@ -126,6 +136,7 @@ export class ConfirmationInfo implements OnInit {
   }
 
   isFreeBooking(): boolean {
-    return !this.clientInfo.amount || this.clientInfo.amount === 0;
+    const amount = this.clientInfo.amount ?? 0;
+    return amount === 0;
   }
 }

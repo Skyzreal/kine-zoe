@@ -24,7 +24,6 @@ export class ConfirmationInfo implements OnInit {
   isProcessingPayment = false;
   paymentError = '';
   selectedSlots: any[] = [];
-  testMode = false;
 
   clientInfo: ClientInfo = {
     prenom: '',
@@ -119,14 +118,7 @@ export class ConfirmationInfo implements OnInit {
         }
       } else {
         // Regular paid booking flow
-        // Use 50 cents if test mode is enabled, otherwise use actual amount
-        // (Stripe minimum is $0.50 CAD)
-        const paymentInfo = {
-          ...this.clientInfo,
-          amount: this.testMode ? 50 : this.clientInfo.amount
-        };
-
-        const session = await this.stripeService.createPaymentSession(paymentInfo);
+        const session = await this.stripeService.createPaymentSession(this.clientInfo);
         await this.stripeService.redirectToCheckout(session.sessionId);
       }
     } catch (error: any) {

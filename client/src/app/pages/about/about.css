@@ -30,6 +30,7 @@ html, body {
   font-weight: 300;
   margin-bottom: 1rem;
   font-family: var(--font-primary, 'Cormorant', serif);
+  color: white;
 }
 
 .hero-content h2 {
@@ -37,6 +38,7 @@ html, body {
   font-weight: 300;
   opacity: 0.9;
   margin-bottom: 2rem;
+  color: white;
 }
 
 .content-area {

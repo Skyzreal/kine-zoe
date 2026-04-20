@@ -40,18 +40,27 @@ const transporter = nodemailer.createTransport({
 
 app.post('/api/create-payment-session', async (req, res) => {
   try {
-    const { clientInfo, amount, currency, service, timeSlot, timeSlotEnd } = req.body;
+    const { clientInfo, amount, currency, service, timeSlot, timeSlotEnd, timeSlots } = req.body;
+
+    const allSlots = timeSlots && timeSlots.length > 0
+      ? timeSlots
+      : [{ date: timeSlot, end: timeSlotEnd }];
 
     const now = new Date();
     const oneMonthLater = new Date();
     oneMonthLater.setMonth(now.getMonth() + 1);
-    const selectedDate = new Date(timeSlot);
 
-    if (selectedDate > oneMonthLater) {
-      return res.status(400).json({
-        error: 'Bookings can only be made up to one month in advance'
-      });
+    for (const slot of allSlots) {
+      if (new Date(slot.date) > oneMonthLater) {
+        return res.status(400).json({ error: 'Bookings can only be made up to one month in advance' });
+      }
     }
+
+    const firstSlot = allSlots[0];
+    const slotCount = allSlots.length;
+    const description = slotCount === 1
+      ? `Rendez-vous le ${new Date(firstSlot.date).toLocaleDateString('fr-CA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'America/Toronto' })}`
+      : `${slotCount} rendez-vous — premier le ${new Date(firstSlot.date).toLocaleDateString('fr-CA', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Toronto' })}`;
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -59,17 +68,7 @@ app.post('/api/create-payment-session', async (req, res) => {
         {
           price_data: {
             currency: currency || 'cad',
-            product_data: {
-              name: service,
-              description: `Appointment on ${new Date(timeSlot).toLocaleDateString('fr-CA', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              })}`,
-            },
+            product_data: { name: service, description },
             unit_amount: amount,
           },
           quantity: 1,
@@ -86,8 +85,9 @@ app.post('/api/create-payment-session', async (req, res) => {
         client_adresse: clientInfo.adresse,
         client_date_naissance: clientInfo.dateNaissance,
         service: service,
-        time_slot: timeSlot,
-        time_slot_end: timeSlotEnd
+        time_slot: firstSlot.date,
+        time_slot_end: firstSlot.end,
+        time_slots: JSON.stringify(allSlots)
       }
     });
 
@@ -141,9 +141,11 @@ async function updateCalendarSlot(clientInfo) {
       return eventStart <= startTime && eventEnd >= endTime;
     });
 
-    const existingClientEvent = existingEvents.data.items?.find(event =>
-      (event.summary || '').includes(clientInfo.name)
-    );
+    const existingClientEvent = existingEvents.data.items?.find(event => {
+      if (!(event.summary || '').includes(clientInfo.name)) return false;
+      const eventStart = new Date(event.start.dateTime || event.start.date);
+      return eventStart.getTime() === startTime.getTime();
+    });
 
     if (existingClientEvent) {
       return existingClientEvent;
@@ -253,26 +255,56 @@ async function updateCalendarSlot(clientInfo) {
   }
 }
 
+function formatSlotsHtml(timeSlots, firstSlotDate, firstSlotTime, firstSlotEndTime) {
+  if (!timeSlots || timeSlots.length <= 1) {
+    return `
+      <p style="margin: 8px 0;"><strong>Date :</strong> ${firstSlotDate}</p>
+      <p style="margin: 8px 0;"><strong>Heure :</strong> ${firstSlotTime}${firstSlotEndTime ? ` - ${firstSlotEndTime}` : ''}</p>
+    `;
+  }
+  const rows = timeSlots.map((slot, i) => {
+    const start = new Date(slot.date);
+    const end = new Date(slot.end);
+    const date = start.toLocaleDateString('fr-CA', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Toronto' });
+    const startTime = start.toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Toronto' });
+    const endTime = end.toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Toronto' });
+    return `<li style="margin: 6px 0;">${date} — ${startTime} à ${endTime}</li>`;
+  }).join('');
+  return `
+    <p style="margin: 8px 0;"><strong>Rendez-vous (${timeSlots.length}) :</strong></p>
+    <ul style="margin: 8px 0; padding-left: 20px;">${rows}</ul>
+  `;
+}
+
 async function sendConfirmationEmail(clientInfo, paymentAmount) {
   try {
-    const appointmentDate = new Date(clientInfo.timeSlot);
+    const allSlots = clientInfo.timeSlots && clientInfo.timeSlots.length > 0
+      ? clientInfo.timeSlots
+      : [{ date: clientInfo.timeSlot, end: clientInfo.timeSlotEnd }];
+
+    const appointmentDate = new Date(allSlots[0].date);
     const formattedDate = appointmentDate.toLocaleDateString('fr-CA', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
+      timeZone: 'America/Toronto'
     });
 
     const formattedTime = appointmentDate.toLocaleTimeString('fr-CA', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      timeZone: 'America/Toronto'
     });
 
-    const appointmentEndDate = clientInfo.timeSlotEnd ? new Date(clientInfo.timeSlotEnd) : null;
+    const appointmentEndDate = allSlots[0].end ? new Date(allSlots[0].end) : null;
     const formattedEndTime = appointmentEndDate ? appointmentEndDate.toLocaleTimeString('fr-CA', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      timeZone: 'America/Toronto'
     }) : null;
+
+    const slotsHtml = formatSlotsHtml(allSlots, formattedDate, formattedTime, formattedEndTime);
 
     // Format payment amount
     const formattedAmount = paymentAmount ? `${(paymentAmount / 100).toFixed(2)} $` : 'Gratuit';
@@ -309,8 +341,7 @@ async function sendConfirmationEmail(clientInfo, paymentAmount) {
           <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #8B8672;">
             <h3 style="color: #8B8672; margin-top: 0;">Détails de la réservation</h3>
             <p style="margin: 8px 0;"><strong>Service :</strong> ${clientInfo.service}</p>
-            <p style="margin: 8px 0;"><strong>Date :</strong> ${formattedDate}</p>
-            <p style="margin: 8px 0;"><strong>Heure :</strong> ${formattedTime}${formattedEndTime ? ` - ${formattedEndTime}` : ''}</p>
+            ${slotsHtml}
             <p style="margin: 8px 0;"><strong>Client :</strong> ${clientInfo.name}</p>
             <p style="margin: 8px 0;"><strong>Téléphone :</strong> ${clientInfo.phone}</p>
             <p style="margin: 8px 0;"><strong>Email :</strong> ${clientInfo.email}</p>
@@ -328,9 +359,6 @@ async function sendConfirmationEmail(clientInfo, paymentAmount) {
 
           <div style="text-align: center; margin-top: 30px;">
             <p style="color: #777; font-size: 14px;">
-              Cet événement a été automatiquement ajouté au calendrier.
-            </p>
-            <p style="color: #777; font-size: 14px;">
               Merci de votre confiance !
             </p>
           </div>
@@ -347,7 +375,7 @@ async function sendConfirmationEmail(clientInfo, paymentAmount) {
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: clientInfo.email,
+      to: process.env.TEST_EMAIL || clientInfo.email,
       subject: `${isFreeBooking ? '✅ Réservation Confirmée' : '✅ Paiement et Réservation Confirmés'} - ${clientInfo.service} - ${formattedDate}`,
       html: emailHtml
     };
@@ -362,24 +390,33 @@ async function sendConfirmationEmail(clientInfo, paymentAmount) {
 
 async function sendOwnerNotification(clientInfo, paymentAmount) {
   try {
-    const appointmentDate = new Date(clientInfo.timeSlot);
+    const allSlots = clientInfo.timeSlots && clientInfo.timeSlots.length > 0
+      ? clientInfo.timeSlots
+      : [{ date: clientInfo.timeSlot, end: clientInfo.timeSlotEnd }];
+
+    const appointmentDate = new Date(allSlots[0].date);
     const formattedDate = appointmentDate.toLocaleDateString('fr-CA', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
+      timeZone: 'America/Toronto'
     });
 
     const formattedTime = appointmentDate.toLocaleTimeString('fr-CA', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      timeZone: 'America/Toronto'
     });
 
-    const appointmentEndDate = clientInfo.timeSlotEnd ? new Date(clientInfo.timeSlotEnd) : null;
+    const appointmentEndDate = allSlots[0].end ? new Date(allSlots[0].end) : null;
     const formattedEndTime = appointmentEndDate ? appointmentEndDate.toLocaleTimeString('fr-CA', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      timeZone: 'America/Toronto'
     }) : null;
+
+    const slotsHtml = formatSlotsHtml(allSlots, formattedDate, formattedTime, formattedEndTime);
 
     const formattedAmount = paymentAmount ? `${(paymentAmount / 100).toFixed(2)} $` : 'Gratuit';
     const isFreeBooking = !paymentAmount || paymentAmount === 0;
@@ -410,8 +447,7 @@ async function sendOwnerNotification(clientInfo, paymentAmount) {
           <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #8B8672;">
             <h3 style="color: #8B8672; margin-top: 0;">Détails du Rendez-vous</h3>
             <p style="margin: 8px 0;"><strong>Service :</strong> ${clientInfo.service}</p>
-            <p style="margin: 8px 0;"><strong>Date :</strong> ${formattedDate}</p>
-            <p style="margin: 8px 0;"><strong>Heure :</strong> ${formattedTime}${formattedEndTime ? ` - ${formattedEndTime}` : ''}</p>
+            ${slotsHtml}
           </div>
 
           <div style="background-color: #fff3cd; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #ffc107;">
@@ -440,7 +476,7 @@ async function sendOwnerNotification(clientInfo, paymentAmount) {
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: process.env.OWNER_EMAIL || process.env.EMAIL_USER,
+      to: process.env.TEST_EMAIL || process.env.OWNER_EMAIL || process.env.EMAIL_USER,
       subject: `🔔 Nouvelle Réservation - ${clientInfo.name} - ${formattedDate}`,
       html: emailHtml,
       replyTo: clientInfo.email
@@ -462,42 +498,31 @@ app.post('/api/create-free-booking', async (req, res) => {
       return res.status(400).json({ error: 'Missing required client information' });
     }
 
-    // Update calendar for free booking
-    await updateCalendarSlot({
+    const allSlots = clientInfo.timeSlots && clientInfo.timeSlots.length > 0
+      ? clientInfo.timeSlots
+      : [{ date: clientInfo.timeSlot, end: clientInfo.timeSlotEnd }];
+
+    const baseInfo = {
       name: clientInfo.name,
       email: clientInfo.email,
       phone: clientInfo.phone,
       adresse: clientInfo.adresse,
       dateNaissance: clientInfo.dateNaissance,
       service: clientInfo.service,
-      timeSlot: clientInfo.timeSlot,
-      timeSlotEnd: clientInfo.timeSlotEnd
-    });
+      timeSlots: allSlots,
+      timeSlot: allSlots[0].date,
+      timeSlotEnd: allSlots[0].end
+    };
 
-    // Send confirmation email (without payment amount)
+    for (const slot of allSlots) {
+      await updateCalendarSlot({ ...baseInfo, timeSlot: slot.date, timeSlotEnd: slot.end });
+    }
+
     try {
-      await sendConfirmationEmail({
-        name: clientInfo.name,
-        email: clientInfo.email,
-        phone: clientInfo.phone,
-        service: clientInfo.service,
-        timeSlot: clientInfo.timeSlot,
-        timeSlotEnd: clientInfo.timeSlotEnd
-      }, 0); // 0 for free booking
-
-      await sendOwnerNotification({
-        name: clientInfo.name,
-        email: clientInfo.email,
-        phone: clientInfo.phone,
-        adresse: clientInfo.adresse,
-        dateNaissance: clientInfo.dateNaissance,
-        service: clientInfo.service,
-        timeSlot: clientInfo.timeSlot,
-        timeSlotEnd: clientInfo.timeSlotEnd
-      }, 0); // 0 for free booking
+      await sendConfirmationEmail(baseInfo, 0);
+      await sendOwnerNotification(baseInfo, 0);
     } catch (emailError) {
       console.error('Error sending confirmation emails:', emailError);
-      // Don't fail the booking if email fails
     }
 
     res.json({
@@ -507,8 +532,8 @@ app.post('/api/create-free-booking', async (req, res) => {
         email: clientInfo.email,
         phone: clientInfo.phone,
         service: clientInfo.service,
-        timeSlot: clientInfo.timeSlot,
-        timeSlotEnd: clientInfo.timeSlotEnd
+        timeSlot: allSlots[0].date,
+        timeSlotEnd: allSlots[0].end
       }
     });
   } catch (error) {
@@ -557,6 +582,16 @@ app.get('/api/verify-payment/:sessionId', async (req, res) => {
     const session = await stripe.checkout.sessions.retrieve(req.params.sessionId);
 
     if (session.payment_status === 'paid') {
+      let allSlots;
+      try {
+        allSlots = JSON.parse(session.metadata.time_slots || 'null');
+      } catch (e) {
+        allSlots = null;
+      }
+      if (!allSlots || allSlots.length === 0) {
+        allSlots = [{ date: session.metadata.time_slot, end: session.metadata.time_slot_end }];
+      }
+
       const clientInfo = {
         name: session.metadata.client_name,
         email: session.metadata.client_email,
@@ -564,32 +599,27 @@ app.get('/api/verify-payment/:sessionId', async (req, res) => {
         adresse: session.metadata.client_adresse,
         dateNaissance: session.metadata.client_date_naissance,
         service: session.metadata.service,
-        timeSlot: session.metadata.time_slot,
-        timeSlotEnd: session.metadata.time_slot_end
+        timeSlot: allSlots[0].date,
+        timeSlotEnd: allSlots[0].end,
+        timeSlots: allSlots
       };
 
       const paymentAmount = session.amount_total;
 
       try {
-        // Update calendar immediately after payment verification
-        await updateCalendarSlot(clientInfo);
+        for (const slot of allSlots) {
+          await updateCalendarSlot({ ...clientInfo, timeSlot: slot.date, timeSlotEnd: slot.end });
+        }
 
-        // Send confirmation emails
         try {
-          // Send email to customer
           await sendConfirmationEmail(clientInfo, paymentAmount);
-
-          // Send notification to owner
           await sendOwnerNotification(clientInfo, paymentAmount);
         } catch (emailError) {
           console.error('Error sending emails:', emailError.message);
-          // Don't throw - calendar update succeeded and payment is complete
         }
 
       } catch (bookingError) {
         console.error('Error processing booking after payment:', bookingError);
-        // Still return success since payment was completed
-        // Calendar/email failures shouldn't affect the user experience
       }
 
       res.json({

@@ -13,6 +13,7 @@ export interface ClientInfo {
   service?: string;
   timeSlot?: string;
   timeSlotEnd?: string;
+  timeSlots?: Array<{date: string, end: string}>;
   amount?: number;
 }
 
@@ -55,11 +56,12 @@ export class StripeService {
       `${this.envService.apiBaseUrl}/api/create-payment-session`,
       {
         clientInfo,
-        amount: clientInfo.amount || 10000, // Default to $100 CAD
+        amount: clientInfo.amount || 10000,
         currency: 'cad',
         service: clientInfo.service,
         timeSlot: clientInfo.timeSlot,
-        timeSlotEnd: clientInfo.timeSlotEnd
+        timeSlotEnd: clientInfo.timeSlotEnd,
+        timeSlots: clientInfo.timeSlots
       }
     ).toPromise();
 
@@ -106,7 +108,8 @@ export class StripeService {
           dateNaissance: clientInfo.dateNaissance,
           service: clientInfo.service,
           timeSlot: clientInfo.timeSlot,
-          timeSlotEnd: clientInfo.timeSlotEnd
+          timeSlotEnd: clientInfo.timeSlotEnd,
+          timeSlots: clientInfo.timeSlots
         }
       }
     ).toPromise();

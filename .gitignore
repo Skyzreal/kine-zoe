@@ -32,6 +32,7 @@ client/.vscode/*
 
 # Miscellaneous
 /.angular/cache
+client/.angular/
 .sass-cache/
 /connect.lock
 /coverage
@@ -46,4 +47,5 @@ Thumbs.db
 /server/service-account.json
 /server/.env
 client/src/environments/environment.ts
+client/src/app/shared/services/environment.config.ts
 /.idea

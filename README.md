@@ -1,5 +1,17 @@
 # KineZoe
 
+Online booking platform for a kinesiology practice. Clients can browse available services, pick a time slot from a live calendar, fill in their info, and pay — all in one flow. Once a booking is confirmed, the appointment is automatically added to Google Calendar and both the client and the practitioner receive a confirmation email.
+
+**Stack:** Angular 20 · Express.js · Google Calendar API · Stripe · Nodemailer (Gmail)
+
+**Features:**
+- Real-time availability pulled from Google Calendar
+- Stripe Checkout for paid sessions; free sessions bypass payment entirely
+- Automatic calendar event creation with a buffer slot after each appointment
+- HTML confirmation emails sent to both client and practitioner
+
+---
+
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.2.
 
 ## Development server

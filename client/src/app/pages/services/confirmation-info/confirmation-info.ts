@@ -5,6 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { StripeService, ClientInfo } from '../../../shared/services/stripe.service';
 import { BookingService } from '../../../shared/services/booking.service';
+import { environment } from '../../../shared/services/environment.config';
 
 @Component({
   selector: 'app-confirmation-info',
@@ -44,6 +45,7 @@ export class ConfirmationInfo implements OnInit {
       this.clientInfo.service = this.bookingService.getSelectedService();
       this.clientInfo.timeSlot = this.selectedSlots[0]?.date || '';
       this.clientInfo.timeSlotEnd = this.selectedSlots[0]?.end || '';
+      this.clientInfo.timeSlots = this.selectedSlots.map(s => ({ date: s.date, end: s.end }));
 
       const duration = this.bookingService.getSelectedDuration();
       if (duration) {
@@ -128,6 +130,7 @@ export class ConfirmationInfo implements OnInit {
   }
 
   isFreeBooking(): boolean {
+    if (environment.testMode) return true;
     const amount = this.clientInfo.amount ?? 0;
     return amount === 0;
   }

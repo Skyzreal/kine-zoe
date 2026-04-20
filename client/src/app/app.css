@@ -10,6 +10,13 @@ app-navbar {
 
 router-outlet + * {
   flex: 1 0 auto;
+  padding-top: 100px;
+}
+
+@media (max-width: 768px) {
+  router-outlet + * {
+    padding-top: 105px;
+  }
 }
 
 app-footer {

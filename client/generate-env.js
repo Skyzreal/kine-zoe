@@ -5,6 +5,7 @@ const path = require('path');
 // Read environment variables
 const stripeKey = process.env.VITE_STRIPE_PUBLISHABLE_KEY || process.env.STRIPE_PUBLISHABLE_KEY || 'pk_live_51SDsFvB44BNKmyHeohM2bBbH8oN1xbdRtkkCMbP3mcDzOkRu0Mj4yvysAEVK9v0PM6nhmX1yX31TCp5Nhg2UqrVZ00JV1OIe7B';
 const apiBaseUrl = process.env.VITE_API_BASE_URL || process.env.API_BASE_URL || 'https://kine-zoe-api.vercel.app';
+const testMode = process.env.TEST_MODE === 'true';
 
 // Generate the environment config file
 const envConfig = `// This file is auto-generated. Do not edit manually.
@@ -13,7 +14,8 @@ const envConfig = `// This file is auto-generated. Do not edit manually.
 export const environment = {
   production: true,
   stripePublishableKey: '${stripeKey}',
-  apiBaseUrl: '${apiBaseUrl}'
+  apiBaseUrl: '${apiBaseUrl}',
+  testMode: ${testMode}
 };
 `;
 

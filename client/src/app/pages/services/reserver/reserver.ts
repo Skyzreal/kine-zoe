@@ -266,6 +266,14 @@ export class ReserverComponent implements OnInit {
     this.selectedDay = day;
   }
 
+  overlapsWithSelected(newStart: Date, newEnd: Date): boolean {
+    return this.selectedSlots.some(selected => {
+      const selectedStart = new Date(selected.date).getTime();
+      const selectedEnd = new Date(selected.end).getTime();
+      return newStart.getTime() < selectedEnd && newEnd.getTime() > selectedStart;
+    });
+  }
+
   selectTimeSlot(slot: TimeSlot) {
     const isAlreadySelected = this.isSlotSelected(slot);
 
@@ -276,7 +284,6 @@ export class ReserverComponent implements OnInit {
     } else {
       if (this.canSelectMoreSlots()) {
         if (this.hasEnoughDuration(slot)) {
-          // Calculate the correct end time based on selected duration
           const appointmentDuration = this.isMassageService()
             ? this.selectedDuration
             : (this.serviceInfo?.duration || 30);
@@ -285,7 +292,10 @@ export class ReserverComponent implements OnInit {
           const endTime = new Date(startTime);
           endTime.setMinutes(endTime.getMinutes() + appointmentDuration);
 
-          // Create a new slot with the correct end time
+          if (this.overlapsWithSelected(startTime, endTime)) {
+            return;
+          }
+
           const bookingSlot: TimeSlot = {
             date: slot.date,
             end: endTime.toISOString(),
